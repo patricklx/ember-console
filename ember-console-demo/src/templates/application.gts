@@ -1,12 +1,22 @@
 import Component from '@glimmer/component';
 import { Text } from 'ember-console';
+import { tracked } from "@glimmer/tracking";
 
 /**
  * Demo application showcasing ember-console Text component
  */
 export default class AppTemplate extends Component {
+	@tracked counter = 0;
+
+	start = () => {
+		setInterval(() => {
+			this.counter += 1;
+		}, 1000);
+	}
+
 	<template>
 		<div>
+			{{(this.start)}}
 			{{! Basic text }}
 			<Text>Hello from ember-console!</Text>
 
@@ -36,6 +46,7 @@ export default class AppTemplate extends Component {
 
 			{{! Inverse }}
 			<Text @inverse={{true}}>This text has inverted colors</Text>
+			<Text>counter: {{this.counter}}</Text>
 		</div>
 	</template>
 }

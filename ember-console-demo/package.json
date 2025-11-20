@@ -12,7 +12,6 @@
   "dependencies": {
     "ember-console": "link:../ember-console",
     "ember-source": "^6.8.2",
-    "@glimmer/tracking": "^1.1.2",
     "@glimmer/component": "^2.0.0",
     "ember-resolver": "^13.1.1",
     "ember-load-initializers": "^2.1.2",

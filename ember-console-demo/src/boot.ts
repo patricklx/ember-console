@@ -1,7 +1,6 @@
-import { setup, DocumentNode, render } from 'ember-console';
+import { setup, DocumentNode, startRender } from 'ember-console';
 import App from './app';
 import type ApplicationClass from "@ember/application";
-import { _backburner } from "@ember/runloop";
 import env from "./config/env";
 
 function init(
@@ -12,7 +11,6 @@ function init(
 	env.rootElement = DocumentNode.getInstance().body;
 
 	const app = Application.create({
-		// @ts-expect-error expected
 		name: env.modulePrefix,
 		version: env.APP.version,
 		ENV: env
@@ -56,6 +54,5 @@ export async function startApp() {
   // Make app available globally for debugging
   (globalThis as any).app = app;
 
-	render(document.body);
-	_backburner.on('end', () => render(document.body));
+	startRender(document);
 }

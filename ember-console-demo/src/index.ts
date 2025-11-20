@@ -1,5 +1,5 @@
 import { startApp } from './boot';
-import { render } from 'ember-console';
+import { startRender } from 'ember-console';
 
 // Start the Ember application
 startApp()

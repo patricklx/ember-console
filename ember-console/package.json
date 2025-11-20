@@ -31,7 +31,6 @@
   "license": "MIT",
   "dependencies": {
     "@glimmer/component": "^2.0.0",
-    "@glimmer/tracking": "^1.1.2",
     "ansi-styles": "^6.2.3",
     "chalk": "^5.6.2",
     "cli-boxes": "^4.0.1",
