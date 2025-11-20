@@ -85,6 +85,41 @@ function clearEntireLine(): void {
 }
 
 /**
+ * Find the common prefix length between two strings
+ */
+function findCommonPrefixLength(str1: string, str2: string): number {
+  const minLen = Math.min(str1.length, str2.length);
+  let i = 0;
+  while (i < minLen && str1[i] === str2[i]) {
+    i++;
+  }
+  return i;
+}
+
+/**
+ * Apply minimal update to a line by only rewriting the changed portion
+ */
+function updateLineMinimal(line: number, oldText: string, newText: string): void {
+  const commonPrefixLen = findCommonPrefixLength(oldText, newText);
+  
+  // If strings are identical, no update needed
+  if (commonPrefixLen === oldText.length && commonPrefixLen === newText.length) {
+    return;
+  }
+  
+  // Move cursor to the position where text starts to differ
+  readline.cursorTo(process.stdout, commonPrefixLen, line);
+  
+  // Clear from cursor to end of line
+  clearLineFromCursor();
+  
+  // Write only the changed portion
+  if (commonPrefixLen < newText.length) {
+    process.stdout.write(newText.substring(commonPrefixLen));
+  }
+}
+
+/**
  * Extract lines from the document tree
  */
 function extractLines(rootNode: ElementNode): string[] {
@@ -154,22 +189,24 @@ function render(rootNode: ElementNode): void {
         // For lines within terminal height, use cursor positioning
         // For lines beyond, let terminal naturally scroll
         if (i < state.terminalHeight) {
-          moveCursorTo(i);
+          if (newLine === undefined) {
+            // Line was removed - clear it
+            moveCursorTo(i);
+            clearEntireLine();
+          } else if (oldLine === undefined) {
+            // New line - just write it
+            moveCursorTo(i);
+            process.stdout.write(newLine);
+          } else {
+            // Line changed - apply minimal update
+            updateLineMinimal(i, oldLine, newLine);
+          }
         } else {
           // Beyond terminal height - just write newline and content
           process.stdout.write('\n');
-        }
-
-        if (newLine === undefined) {
-          // Line was removed - clear it
-          clearEntireLine();
-        } else if (oldLine === undefined) {
-          // New line - just write it
-          process.stdout.write(newLine);
-        } else {
-          // Line changed - clear and rewrite
-          clearEntireLine();
-          process.stdout.write(newLine);
+          if (newLine !== undefined) {
+            process.stdout.write(newLine);
+          }
         }
       }
     }
