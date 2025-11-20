@@ -20,9 +20,9 @@ importers:
       chalk:
         specifier: ^5.3.0
         version: 5.6.2
-      ember-ink:
-        specifier: file:../ember
-        version: file:../ember(@glimmer/component@1.1.2(@babel/core@7.28.5))(@glimmer/tracking@1.1.2)
+      ember-console:
+        specifier: file:../ember-console
+        version: ember-ink@file:../ember-console(@glimmer/component@1.1.2(@babel/core@7.28.5))(@glimmer/tracking@1.1.2)
       ember-load-initializers:
         specifier: ^2.1.2
         version: 2.1.2(@babel/core@7.28.5)
@@ -2028,8 +2028,8 @@ packages:
     resolution: {integrity: sha512-BtkjulweiXo9c3yVWrtexw2dTmBrvavD/xixNC6TKOBdrixUwU+6nuOO9dufDWsMxoid7MvtmDpzc9+mE8PdaA==}
     engines: {node: 10.* || >= 12.*}
 
-  ember-ink@file:../ember:
-    resolution: {directory: ../ember, type: directory}
+  ember-ink@file:../ember-console:
+    resolution: {directory: ../ember-console, type: directory}
     peerDependencies:
       '@glimmer/component': ^1.1.2
       '@glimmer/tracking': ^1.1.2
@@ -6637,7 +6637,7 @@ snapshots:
       - '@babel/core'
       - supports-color
 
-  ember-ink@file:../ember(@glimmer/component@1.1.2(@babel/core@7.28.5))(@glimmer/tracking@1.1.2):
+  ember-ink@file:../ember-console(@glimmer/component@1.1.2(@babel/core@7.28.5))(@glimmer/tracking@1.1.2):
     dependencies:
       '@glimmer/component': 1.1.2(@babel/core@7.28.5)
       '@glimmer/tracking': 1.1.2

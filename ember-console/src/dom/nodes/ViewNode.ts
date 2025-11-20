@@ -1,4 +1,3 @@
-import { getViewMeta, normalizeElementName } from '../element-registry.ts';
 import DocumentNode from './DocumentNode.ts';
 
 function* elementIterator(el: any): Generator<any, void, unknown> {

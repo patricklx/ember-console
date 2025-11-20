@@ -1,12 +1,7 @@
-import { createElement } from '../element-registry.ts';
 import CommentNode from './CommentNode.ts';
 import ElementNode from './ElementNode.ts';
-import PropertyNode from './PropertyNode.ts';
 import TextNode from './TextNode.ts';
-import ViewNode from './ViewNode.ts';
-import type { NativeElementsTagNameMap } from '../native-elements-tag-name-map.ts';
-import type PageElement from '../native/PageElement.ts';
-import NativeElementNode from '../native/NativeElementNode.ts';
+import ViewNode, { EventListener } from './ViewNode.ts';
 
 function* elementIterator(el: any): Generator<any, void, unknown> {
   yield el;
@@ -78,51 +73,6 @@ export default class DocumentNode extends ViewNode {
 
   createComment(text: string) {
     return new CommentNode(text);
-  }
-
-  static createPropertyNode(tagName: string): PropertyNode {
-    return new PropertyNode(tagName);
-  }
-
-  createElement(name: string) {
-    return DocumentNode.createElement(name as any);
-  }
-
-  static createElement<T extends keyof NativeElementsTagNameMap>(
-    tagName: T,
-  ): NativeElementsTagNameMap[T] {
-    if (tagName === 'property') {
-      return this.createPropertyNode(tagName) as any;
-    }
-    const e = createElement(tagName);
-    e._ownerDocument = this.getInstance();
-    if (e instanceof NativeElementNode && e.nativeView) {
-      this.getInstance().nodeMap.set(e.nativeView._domId, e);
-    }
-    if (tagName === 'page') {
-      this.getInstance().page = e as PageElement;
-
-      Object.defineProperty(this.getInstance(), 'body', {
-        configurable: true,
-        get() {
-          const page = this.page;
-          return {
-            insertAdjacentHTML() {
-              return null;
-            },
-            addEventListener: globalThis.addEventListener.bind(page),
-            get lastChild() {
-              return null;
-            },
-          };
-        },
-      });
-    }
-    return e;
-  }
-
-  createElementNS(_namespace: any, tagName: keyof NativeElementsTagNameMap) {
-    return DocumentNode.createElement(tagName);
   }
 
   createTextNode(text: string) {

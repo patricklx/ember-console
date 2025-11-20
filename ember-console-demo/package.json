@@ -1,5 +1,5 @@
 {
-  "name": "ember-ink-demo",
+  "name": "ember-console-demo",
   "version": "0.1.0",
   "description": "Demo application for Ember-Ink",
   "type": "module",
@@ -10,7 +10,7 @@
     "build": "rollup -c"
   },
   "dependencies": {
-    "ember-ink": "file:../ember",
+    "ember-console": "file:../ember-console",
     "ember-source": "^5.4.0",
     "@glimmer/component": "^1.1.2",
     "@glimmer/tracking": "^1.1.2",
