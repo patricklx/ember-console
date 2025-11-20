@@ -48,12 +48,25 @@ export interface RenderInstance {
   clear: () => void;
 }
 
+import { createInterface } from 'node:readline';
+import * as readline from "node:readline";
+import * as console from "node:console";
+const rl = createInterface({
+	input: process.stdin,
+	output: process.stdout,
+});
+
+const lines = [];
+
 function render(rootNode: ElementNode) {
-	process.stdout.cursorTo(0, 0);
-	process.stdout.clearScreenDown();
+	console.clear();
+	process.stdout.write('\u001b[3J\u001b[1J');
+	let i = 0;
 	for (const node of elementIterator(rootNode)) {
 		if (node instanceof TerminaTextElement) {
 			process.stdout.write(node.text + '\n');
+			lines[i] = node.text;
+			i += 1;
 		}
 	}
 }
@@ -64,6 +77,7 @@ function render(rootNode: ElementNode) {
 export function startRender(
   document: DocumentNode
 ): void {
+	console.clear();
 	render(document.body);
 	_backburner.on('end', () => render(document.body));
 

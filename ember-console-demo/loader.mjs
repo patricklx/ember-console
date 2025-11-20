@@ -141,7 +141,7 @@ export async function load(url, context, nextLoad) {
       // Pre-process .gts files with content-tag first
       if (filePath.endsWith('.gts')) {
         try {
-          const processed = contentTagProcessor.process(source);
+          const processed = contentTagProcessor.process(source, { inline_source_map: true });
           source = processed.code;
           // Change filename to .ts for Babel to process it correctly
           processedFilename = filePath.replace(/\.gts$/, '.ts');
