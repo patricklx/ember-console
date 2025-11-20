@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ES2022",
+    "lib": ["ES2022"],
+    "moduleResolution": "bundler",
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true,
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "paths": {
+      "@ember/*": ["./node_modules/ember-source/dist/packages/@ember/*"],
+      "ember": ["./node_modules/ember-source/dist/packages/ember"],
+      "@glimmer/*": ["./node_modules/ember-source/dist/packages/@glimmer/*"],
+      "ember-ink": ["../ember/dist/index.js"]
+    }
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
+}
