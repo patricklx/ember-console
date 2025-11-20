@@ -1,5 +1,5 @@
 import { startApp } from './boot';
-import { render } from 'ember-ink';
+import { render } from 'ember-console';
 
 // Start the Ember application
 startApp()
@@ -7,6 +7,6 @@ startApp()
     // Start rendering to terminal
   })
   .catch((error) => {
-    console.error('Failed to start Ember-Ink application:', error);
+    console.error('Failed to start ember-console application:', error);
     process.exit(1);
   });

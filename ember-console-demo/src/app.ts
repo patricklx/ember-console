@@ -13,10 +13,10 @@ if (typeof window !== 'undefined') {
 const modules: Record<string, any> = {};
 
 // Register the router
-modules['ember-ink-demo/app/router'] = {
+modules['ember-console-demo/app/router'] = {
   default: Router,
 };
-modules['ember-ink-demo/templates/application'] = {
+modules['ember-console-demo/templates/application'] = {
 	default: AppTemplate,
 };
 

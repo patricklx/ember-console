@@ -1,5 +1,5 @@
 export default {
-  modulePrefix: 'ember-ink-demo',
+  modulePrefix: 'ember-console-demo',
   environment: 'development',
   rootElement: '#app',
   autoboot: false,

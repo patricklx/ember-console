@@ -1,4 +1,4 @@
-import { setup, TerminalDocumentNode } from 'ember-ink';
+import { setup, TerminalDocumentNode } from 'ember-console';
 import App from './app';
 import type ApplicationClass from "@ember/application";
 import env from "./config/env";
@@ -28,7 +28,7 @@ export async function boot() {
       // Set up the terminal environment (creates document, window, etc.)
       setup();
 
-      console.log('🚀 Starting Ember-Ink Application...\n');
+      console.log('🚀 Starting ember-console Application...\n');
 
       // Resolve immediately - we're ready to visit
       resolve();
@@ -50,7 +50,7 @@ export async function startApp() {
     isInteractive: true,
   });
 
-  console.log('\n✨ Ember-Ink application started successfully!');
+  console.log('\n✨ ember-console application started successfully!');
 
   // Make app available globally for debugging
   (globalThis as any).app = app;

@@ -1,14 +1,14 @@
 import Component from '@glimmer/component';
-import { Text } from 'ember-ink';
+import { Text } from 'ember-console';
 
 /**
- * Demo application showcasing Ember-Ink Text component
+ * Demo application showcasing ember-console Text component
  */
 export default class App extends Component {
   <template>
     <div>
       {{! Basic text }}
-      <Text>Hello from Ember-Ink!</Text>
+      <Text>Hello from ember-console!</Text>
 
       {{! Colored text }}
       <Text @color="green">This text is green</Text>
