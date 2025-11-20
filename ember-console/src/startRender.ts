@@ -85,37 +85,89 @@ function clearEntireLine(): void {
 }
 
 /**
- * Find the common prefix length between two strings
+ * Represents a segment of text that needs to be updated
  */
-function findCommonPrefixLength(str1: string, str2: string): number {
-  const minLen = Math.min(str1.length, str2.length);
-  let i = 0;
-  while (i < minLen && str1[i] === str2[i]) {
-    i++;
-  }
-  return i;
+interface TextSegment {
+  start: number;
+  text: string;
 }
 
 /**
- * Apply minimal update to a line by only rewriting the changed portion
+ * Find all segments that differ between old and new text by comparing character by character
+ */
+function findDiffSegments(oldText: string, newText: string): TextSegment[] {
+  const segments: TextSegment[] = [];
+  const maxLen = Math.max(oldText.length, newText.length);
+  
+  let segmentStart = -1;
+  let segmentText = '';
+  
+  for (let i = 0; i < maxLen; i++) {
+    const oldChar = i < oldText.length ? oldText[i] : undefined;
+    const newChar = i < newText.length ? newText[i] : undefined;
+    
+    if (oldChar !== newChar) {
+      // Characters differ - start or continue a segment
+      if (segmentStart === -1) {
+        segmentStart = i;
+        segmentText = newChar !== undefined ? newChar : '';
+      } else {
+        segmentText += newChar !== undefined ? newChar : '';
+      }
+    } else {
+      // Characters match - end current segment if any
+      if (segmentStart !== -1) {
+        segments.push({
+          start: segmentStart,
+          text: segmentText
+        });
+        segmentStart = -1;
+        segmentText = '';
+      }
+    }
+  }
+  
+  // Don't forget the last segment if we ended on a difference
+  if (segmentStart !== -1) {
+    segments.push({
+      start: segmentStart,
+      text: segmentText
+    });
+  }
+  
+  return segments;
+}
+
+/**
+ * Apply minimal update to a line by only rewriting the changed portions
  */
 function updateLineMinimal(line: number, oldText: string, newText: string): void {
-  const commonPrefixLen = findCommonPrefixLength(oldText, newText);
+  const segments = findDiffSegments(oldText, newText);
   
-  // If strings are identical, no update needed
-  if (commonPrefixLen === oldText.length && commonPrefixLen === newText.length) {
+  // If no segments, strings are identical
+  if (segments.length === 0) {
     return;
   }
   
-  // Move cursor to the position where text starts to differ
-  readline.cursorTo(process.stdout, commonPrefixLen, line);
-  
-  // Clear from cursor to end of line
-  clearLineFromCursor();
-  
-  // Write only the changed portion
-  if (commonPrefixLen < newText.length) {
-    process.stdout.write(newText.substring(commonPrefixLen));
+  // Apply each segment update
+  for (const segment of segments) {
+    // Move cursor to the start of the changed segment
+    readline.cursorTo(process.stdout, segment.start, line);
+    
+    // If this is the last segment and new text is shorter, clear to end of line
+    const isLastSegment = segment === segments[segments.length - 1];
+    const needsClear = isLastSegment && (segment.start + segment.text.length < oldText.length);
+    
+    if (needsClear) {
+      clearLineFromCursor();
+    }
+    
+    // Write the new text for this segment
+    if (segment.text.length > 0) {
+      process.stdout.write(segment.text);
+    } else if (needsClear) {
+      // Just clearing, no text to write
+    }
   }
 }
 
