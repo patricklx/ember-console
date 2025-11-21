@@ -585,20 +585,19 @@ function render(rootNode: ElementNode): void {
   const newLines = extractLines(rootNode);
   const oldLines = state.lines;
 
-  // Check if any lines in the scroll buffer (beyond terminal height) have changed
+  // Check if we need a full redraw:
+  // 1. If there's content in the scroll buffer (oldLines.length > terminalHeight)
+  // 2. AND any line has changed (including visible lines, as they might have been in scroll buffer)
   const needsFullRedraw = oldLines.length > state.terminalHeight &&
     (() => {
-      // Check if any line beyond visible area changed
-      const scrollBufferStart = state.terminalHeight;
-      const maxScrollCheck = Math.min(newLines.length, oldLines.length);
-      for (let i = scrollBufferStart; i < maxScrollCheck; i++) {
+      // If there's a scroll buffer, check if ANY line changed
+      const maxCheck = Math.max(newLines.length, oldLines.length);
+      for (let i = 0; i < maxCheck; i++) {
         if (newLines[i] !== oldLines[i]) {
           return true;
         }
       }
-      // Also check if lengths differ in scroll buffer area
-      return newLines.length !== oldLines.length &&
-             (newLines.length > scrollBufferStart || oldLines.length > scrollBufferStart);
+      return false;
     })();
 
   // If scroll buffer changed, clear everything and redraw
