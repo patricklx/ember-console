@@ -53,7 +53,7 @@ export default class TomsterTemplate extends Component {
            .                             .                  `;
 
 	<template>
-		<Text @bold={{true}} @color="red">Ember Tomster ASCII Art (from img.png)</Text>
+		<Text @bold={{true}} @color="red">Ember Tomster ASCII Art</Text>
 		<Text @color="yellow" @preFormated={{true}}>{{this.tomsterAscii}}</Text>
 	</template>
 }

@@ -13,10 +13,19 @@ const eq = (a, b) => a === b;
 export default class AppTemplate extends Component {
 	@service declare router: RouterService;
 	@tracked selectedView: 'colors' | 'lorem' | 'tomster' = 'colors';
-    @tracked counter = 0;
+  @tracked counter = 0;
+  @tracked debug = [];
+
+  get debugMessages() {
+    return this.debug.join('\n');
+  }
 
 	constructor(owner: unknown, args: object) {
 		super(owner, args);
+
+    console.log = (...args) => {
+      this.debug.push(args.join(' '));
+    }
 
 		// Set up keyboard listener on the document node
 		if (typeof document !== 'undefined') {
@@ -51,7 +60,10 @@ export default class AppTemplate extends Component {
 	}
 
 	<template>
-		<Text @bold={{true}} @color="cyan">Select a view (press 1, 2, or 3): {{this.counter}}</Text>
+    <Text>
+      {{this.debugMessages}}
+    </Text>
+		<Text @bold={{true}} @color="cyan">Select a view (press 1, 2, or 3): {{this.selectedView}}</Text>
 		<Text @color={{if (eq this.selectedView "colors") "green" "white"}}>[1] Colors Demo</Text>
 		<Text @color={{if (eq this.selectedView "lorem") "green" "white"}}>[2] Lorem Ipsum Generator</Text>
 		<Text @color={{if (eq this.selectedView "tomster") "green" "white"}}>[3] Ember Tomster ASCII Art</Text>

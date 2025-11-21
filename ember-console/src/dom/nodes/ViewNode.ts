@@ -10,7 +10,7 @@ function* elementIterator(el: any): Generator<any, void, unknown> {
 export type EventListener = (args: any) => void;
 
 export default class ViewNode {
-  attributes: any;
+  attributesObject: any = {};
   args: any;
   template: any;
 
@@ -75,15 +75,14 @@ export default class ViewNode {
 
     this._ownerDocument = null;
     this._meta = null;
-    this.attributes = [];
   }
 
-  hasAttribute() {
-    return false;
+  hasAttribute(key: string) {
+    return this.attributesObject[key];
   }
 
-  removeAttribute() {
-    return false;
+  removeAttribute(key: string) {
+    delete this.attributesObject[key];
   }
 
   /* istanbul ignore next */
@@ -135,17 +134,20 @@ export default class ViewNode {
     return null;
   }
 
+  get attributes(): any {
+    return Object.entries(this.attributesObject).map(([key, value]) => ({
+      nodeName: key,
+      nodeValue: value,
+    }));
+  }
+
   getAttribute(key: string) {
     return this[key as keyof this];
   }
 
   /* istanbul ignore next */
   setAttribute(key: string, value: any) {
-    this.attributes.push({
-      nodeName: key,
-      nodeValue: value,
-    });
-
+    this.attributesObject[key] = value;
     this[key as keyof this] = value;
   }
 
