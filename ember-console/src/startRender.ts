@@ -563,6 +563,9 @@ function updateLineMinimal(line: number, oldText: string, newText: string): void
       // Just clearing, no text to write
     }
   }
+  
+  // Reset ANSI codes at end of line to prevent color bleeding to next line
+  process.stdout.write('\x1b[0m');
 }
 
 /**
