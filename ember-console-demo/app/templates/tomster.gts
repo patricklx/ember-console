@@ -5,7 +5,8 @@ import { Text } from 'ember-console';
  * Ember Tomster ASCII art view
  */
 export default class TomsterTemplate extends Component {
-	tomsterAscii = `                            .               **%%%%%??       
+	tomsterAscii = `
+                            .               **%%%%%??       
     :+;;;;;;:,.   ,,:::;;;;;;;;;;;::::   *?%%S%?%%%%%+      
   +*?????***+++;;;;+++++++++++++++++++;:?S##S?%%%%%%%*      
   *%%%%%%%??**+;++++++++++++++++++++++++++%%?%%%%%%%?;      

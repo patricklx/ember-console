@@ -13,6 +13,7 @@ const eq = (a, b) => a === b;
 export default class AppTemplate extends Component {
 	@service declare router: RouterService;
 	@tracked selectedView: 'colors' | 'lorem' | 'tomster' = 'colors';
+    @tracked counter = 0;
 
 	constructor(owner: unknown, args: object) {
 		super(owner, args);
@@ -35,6 +36,7 @@ export default class AppTemplate extends Component {
 
 	handleKeyPress = (event: any) => {
 		const key = event.key;
+        this.counter += 1;
 
 		if (key === '1') {
 			this.selectedView = 'colors';
@@ -49,7 +51,7 @@ export default class AppTemplate extends Component {
 	}
 
 	<template>
-		<Text @bold={{true}} @color="cyan">Select a view (press 1, 2, or 3):</Text>
+		<Text @bold={{true}} @color="cyan">Select a view (press 1, 2, or 3): {{this.counter}}</Text>
 		<Text @color={{if (eq this.selectedView "colors") "green" "white"}}>[1] Colors Demo</Text>
 		<Text @color={{if (eq this.selectedView "lorem") "green" "white"}}>[2] Lorem Ipsum Generator</Text>
 		<Text @color={{if (eq this.selectedView "tomster") "green" "white"}}>[3] Ember Tomster ASCII Art</Text>

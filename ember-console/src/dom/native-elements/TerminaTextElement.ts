@@ -65,7 +65,12 @@ export class TerminaTextElement extends ElementNode {
 		super('terminal-text');
 	}
 
-	updateText() {
+    setAttribute(key: string, value: any) {
+        super.setAttribute(key, value);
+        this.updateText();
+    }
+
+    updateText() {
 		let t = this.childNodes
 			.map((c) => (c as any).text)
 			.filter(Boolean)

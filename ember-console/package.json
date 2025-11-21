@@ -17,15 +17,11 @@
   "scripts": {
     "build": "rollup --config",
     "dev": "rollup --config --watch",
-    "clean": "rm -rf dist"
+    "clean": "rm -rf dist",
+    "test": "vitest --run"
   },
   "keywords": [
-    "ember",
-    "terminal",
-    "cli",
-    "tui",
-    "console",
-    "ink"
+    "ember-addon"
   ],
   "author": "",
   "license": "MIT",
@@ -54,15 +50,13 @@
     "content-tag": "^4.0.0",
     "ember-concurrency": "^5.1.0",
     "rollup": "^4.9.0",
-    "typescript": "^5.3.3"
+    "typescript": "^5.3.3",
+    "vitest": "^4.0.12"
   },
   "peerDependencies": {
     "@glimmer/component": "^2.0.0",
     "@glimmer/tracking": "^1.1.2"
   },
-  "keywords": [
-    "ember-addon"
-  ],
   "ember-addon": {
     "version": 2,
     "type": "addon"

@@ -87,55 +87,203 @@ function clearEntireLine(): void {
 /**
  * Represents a segment of text that needs to be updated
  */
-interface TextSegment {
+export interface TextSegment {
   start: number;
   text: string;
 }
 
 /**
- * Find all segments that differ between old and new text by comparing character by character
+ * Parse text into tokens, treating ANSI escape sequences as single units
  */
-function findDiffSegments(oldText: string, newText: string): TextSegment[] {
-  const segments: TextSegment[] = [];
-  const maxLen = Math.max(oldText.length, newText.length);
+export interface Token {
+  value: string;
+  isAnsi: boolean;
+  visualLength: number; // 0 for ANSI codes, 1 for regular chars
+}
+
+export function tokenize(text: string): Token[] {
+  const tokens: Token[] = [];
+  let i = 0;
   
-  let segmentStart = -1;
-  let segmentText = '';
-  
-  for (let i = 0; i < maxLen; i++) {
-    const oldChar = i < oldText.length ? oldText[i] : undefined;
-    const newChar = i < newText.length ? newText[i] : undefined;
-    
-    if (oldChar !== newChar) {
-      // Characters differ - start or continue a segment
-      if (segmentStart === -1) {
-        segmentStart = i;
-        segmentText = newChar !== undefined ? newChar : '';
-      } else {
-        segmentText += newChar !== undefined ? newChar : '';
+  while (i < text.length) {
+    // Check for ANSI escape sequence
+    if (text[i] === '\x1b' && text[i + 1] === '[') {
+      // Find the end of the ANSI sequence (ends with a letter)
+      let j = i + 2;
+      while (j < text.length && !/[a-zA-Z]/.test(text[j])) {
+        j++;
       }
-    } else {
-      // Characters match - end current segment if any
-      if (segmentStart !== -1) {
-        segments.push({
-          start: segmentStart,
-          text: segmentText
+      if (j < text.length) {
+        j++; // Include the final letter
+        tokens.push({
+          value: text.slice(i, j),
+          isAnsi: true,
+          visualLength: 0
         });
-        segmentStart = -1;
-        segmentText = '';
+        i = j;
+        continue;
+      }
+    }
+    
+    // Regular character
+    tokens.push({
+      value: text[i],
+      isAnsi: false,
+      visualLength: 1
+    });
+    i++;
+  }
+  
+  return tokens;
+}
+
+/**
+ * Represents a range of text with its active ANSI state
+ */
+interface StateRange {
+  visualStart: number;
+  visualEnd: number;
+  ansiState: string;
+  text: string; // The visible text (without ANSI codes)
+  fullText: string; // The full text including ANSI codes
+}
+
+/**
+ * Extract ranges of text grouped by their active ANSI state
+ */
+export function extractStateRanges(tokens: Token[]): StateRange[] {
+  const ranges: StateRange[] = [];
+  let currentAnsiState = '';
+  let currentText = '';
+  let currentFullText = '';
+  let rangeStart = 0;
+  let visualPos = 0;
+  
+  for (const token of tokens) {
+    if (token.isAnsi) {
+      // ANSI code changes the state
+      if (currentText.length > 0) {
+        // Save the previous range before state changes
+        ranges.push({
+          visualStart: rangeStart,
+          visualEnd: visualPos,
+          ansiState: currentAnsiState,
+          text: currentText,
+          fullText: currentFullText
+        });
+        currentText = '';
+        currentFullText = '';
+        rangeStart = visualPos;
+      }
+      // Update state
+      currentAnsiState += token.value;
+      currentFullText += token.value;
+    } else {
+      // Regular character
+      currentText += token.value;
+      currentFullText += token.value;
+      visualPos += token.visualLength;
+    }
+  }
+  
+  // Don't forget the last range
+  if (currentText.length > 0 || currentFullText.length > 0) {
+    ranges.push({
+      visualStart: rangeStart,
+      visualEnd: visualPos,
+      ansiState: currentAnsiState,
+      text: currentText,
+      fullText: currentFullText
+    });
+  }
+  
+  return ranges;
+}
+
+/**
+ * Find all segments that differ between old and new text, considering ANSI color codes
+ */
+export function findDiffSegments(oldText: string, newText: string): TextSegment[] {
+  const oldTokens = tokenize(oldText);
+  const newTokens = tokenize(newText);
+  
+  const oldRanges = extractStateRanges(oldTokens);
+  const newRanges = extractStateRanges(newTokens);
+  
+  const segments: TextSegment[] = [];
+  
+  let oldIdx = 0;
+  let newIdx = 0;
+  let oldVisualPos = 0;
+  let newVisualPos = 0;
+  
+  while (oldIdx < oldRanges.length || newIdx < newRanges.length) {
+    const oldRange = oldIdx < oldRanges.length ? oldRanges[oldIdx] : null;
+    const newRange = newIdx < newRanges.length ? newRanges[newIdx] : null;
+    
+    if (!newRange) {
+      // No more new ranges, we're done (old text was longer)
+      break;
+    }
+    
+    if (!oldRange) {
+      // No more old ranges, all remaining new ranges are additions
+      segments.push({
+        start: newVisualPos,
+        text: newRange.ansiState + newRange.text
+      });
+      newVisualPos = newRange.visualEnd;
+      newIdx++;
+      continue;
+    }
+    
+    // Compare ranges at the same visual position
+    const oldRangeLength = oldRange.visualEnd - oldRange.visualStart;
+    const newRangeLength = newRange.visualEnd - newRange.visualStart;
+    
+    // Check if ANSI state and text content are identical
+    const stateMatches = oldRange.ansiState === newRange.ansiState;
+    const textMatches = oldRange.text === newRange.text;
+    
+    if (stateMatches && textMatches && oldRangeLength === newRangeLength) {
+      // Ranges are identical, skip both
+      oldVisualPos = oldRange.visualEnd;
+      newVisualPos = newRange.visualEnd;
+      oldIdx++;
+      newIdx++;
+    } else {
+      // Ranges differ, create a segment for the new range
+      segments.push({
+        start: newVisualPos,
+        text: newRange.ansiState + newRange.text
+      });
+      
+      // Advance positions
+      const minLength = Math.min(oldRangeLength, newRangeLength);
+      if (minLength > 0) {
+        oldVisualPos += minLength;
+        newVisualPos += minLength;
+      }
+      
+      // Advance to next range(s)
+      if (oldVisualPos >= oldRange.visualEnd) {
+        oldIdx++;
+      }
+      if (newVisualPos >= newRange.visualEnd) {
+        newIdx++;
       }
     }
   }
   
-  // Don't forget the last segment if we ended on a difference
-  if (segmentStart !== -1) {
-    segments.push({
-      start: segmentStart,
-      text: segmentText
-    });
-  }
-  
   return segments;
+}
+
+/**
+ * Calculate visual length of text (excluding ANSI codes)
+ */
+function getVisualLength(text: string): number {
+  const tokens = tokenize(text);
+  return tokens.reduce((sum, token) => sum + token.visualLength, 0);
 }
 
 /**
@@ -143,26 +291,30 @@ function findDiffSegments(oldText: string, newText: string): TextSegment[] {
  */
 function updateLineMinimal(line: number, oldText: string, newText: string): void {
   const segments = findDiffSegments(oldText, newText);
-  
+
   // If no segments, strings are identical
   if (segments.length === 0) {
     return;
   }
-  
+
+  const oldVisualLength = getVisualLength(oldText);
+  const newVisualLength = getVisualLength(newText);
+
   // Apply each segment update
   for (const segment of segments) {
-    // Move cursor to the start of the changed segment
+    // Move cursor to the visual position of the changed segment
     readline.cursorTo(process.stdout, segment.start, line);
-    
-    // If this is the last segment and new text is shorter, clear to end of line
+
+    // If this is the last segment and new text is visually shorter, clear to end of line
     const isLastSegment = segment === segments[segments.length - 1];
-    const needsClear = isLastSegment && (segment.start + segment.text.length < oldText.length);
-    
+    const segmentVisualLength = getVisualLength(segment.text);
+    const needsClear = isLastSegment && (segment.start + segmentVisualLength < oldVisualLength);
+
     if (needsClear) {
       clearLineFromCursor();
     }
-    
-    // Write the new text for this segment
+
+    // Write the new text for this segment (including any ANSI codes)
     if (segment.text.length > 0) {
       process.stdout.write(segment.text);
     } else if (needsClear) {
@@ -192,8 +344,7 @@ function render(rootNode: ElementNode): void {
   const oldLines = state.lines;
 
   // Check if any lines in the scroll buffer (beyond terminal height) have changed
-  const needsFullRedraw = newLines.length > state.terminalHeight && 
-    oldLines.length > state.terminalHeight &&
+  const needsFullRedraw = oldLines.length > state.terminalHeight &&
     (() => {
       // Check if any line beyond visible area changed
       const scrollBufferStart = state.terminalHeight;
@@ -204,7 +355,7 @@ function render(rootNode: ElementNode): void {
         }
       }
       // Also check if lengths differ in scroll buffer area
-      return newLines.length !== oldLines.length && 
+      return newLines.length !== oldLines.length &&
              (newLines.length > scrollBufferStart || oldLines.length > scrollBufferStart);
     })();
 
