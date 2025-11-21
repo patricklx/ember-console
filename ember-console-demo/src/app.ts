@@ -1,5 +1,5 @@
 import EmberApplication from '@ember/application';
-import Resolver from 'ember-resolver';
+import Resolver from 'ember-resolver/index.js';
 import ENV from './config/env';
 import Router from './router';
 import AppTemplate from "./templates/application.gts";

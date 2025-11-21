@@ -8,4 +8,5 @@ export default class Router extends EmberRouter {
 
 Router.map(function () {
   // Define your routes here
+    this.route('/index');
 });

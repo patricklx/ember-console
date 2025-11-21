@@ -59,5 +59,12 @@
   "peerDependencies": {
     "@glimmer/component": "^2.0.0",
     "@glimmer/tracking": "^1.1.2"
+  },
+  "keywords": [
+    "ember-addon"
+  ],
+  "ember-addon": {
+    "version": 2,
+    "type": "addon"
   }
 }

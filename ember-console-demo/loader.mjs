@@ -1,10 +1,11 @@
-import { resolve as resolvePath, dirname } from 'path';
+import path, { resolve as resolvePath, dirname } from 'path';
 import { fileURLToPath, pathToFileURL } from 'url';
 import { existsSync, readdirSync, statSync, readFileSync, realpathSync } from 'fs';
 import { cwd } from 'process';
 import { transformSync } from '@babel/core';
 import babelConfig from './babel.config.cjs';
 import { Preprocessor } from 'content-tag';
+import { resolver, templateTag } from '@embroider/vite';
 
 const contentTagProcessor = new Preprocessor();
 
@@ -18,9 +19,14 @@ const glimmerPath = resolvePath(emberSourcePath, '@glimmer');
 const glimmerDirs = existsSync(glimmerPath) ? readdirSync(glimmerPath) : [];
 
 // Helper function to try multiple extensions
-function tryExtensions(basePath, extensions = ['js', 'ts', 'gts']) {
+function tryExtensions(basePath, extensions = ['js', 'ts', 'gts', '.gjs']) {
   // Try with extensions first
-	basePath = basePath.replace('.js', '');
+	basePath = basePath
+    .replace('.js', '')
+    .replace('.ts', '')
+    .replace('.gjs', '')
+    .replace('.gts', '')
+    .replace('file://', '');
   for (const ext of extensions) {
     const fullPath = `${basePath}.${ext}`;
     if (existsSync(fullPath)) {
@@ -52,126 +58,81 @@ function tryExtensions(basePath, extensions = ['js', 'ts', 'gts']) {
   return null;
 }
 
+const emberResolver = resolver();
+const emberTemplateTag = templateTag();
+
+async function log(...args) {
+  const str = args.map(x => typeof x === 'object' ? JSON.stringify(x, null, 2) : x.toString()).join(' ');
+  await new Promise(resolve => process.stdout.write(`${str.toString()}
+`, resolve))
+}
+
 export async function resolve(specifier, context, nextResolve) {
-  // Handle @ember/* imports
-  if (specifier.startsWith('@ember/')) {
-    const basePath = resolvePath(emberSourcePath, specifier);
-    const resolved = tryExtensions(basePath);
-
-    if (resolved) {
-      return {
-        url: pathToFileURL(resolved).href,
-        shortCircuit: true,
-      };
-    }
-  }
-
-  // Handle @glimmer/* imports
-  if (specifier.startsWith('@glimmer/')) {
-    const glimmerPackage = specifier.replace('@glimmer/', '');
-    if (glimmerDirs.includes(glimmerPackage)) {
-      const basePath = resolvePath(glimmerPath, glimmerPackage);
-      const resolved = tryExtensions(basePath);
-      if (resolved) {
+  console.log('context', context);
+  const emberResolverContext = {
+    async resolve(spec, from) {
+      await log('resolve', spec, from);
+      if (!from.startsWith('file://')) {
+        from = `file://${from}`;
+      }
+      try {
+        if (spec.startsWith('ember-source')) {
+          from = `file://` + path.resolve('./package.json');
+        }
+        const fullPath = spec.startsWith('.') ? path.resolve(path.dirname(from.slice('file://'.length)), spec) : spec;
+        const resolved = tryExtensions(fullPath) || fullPath;
+        const res = await nextResolve(resolved, {
+          conditions: ['node', 'import', 'module-sync', 'node-addons'],
+          importAttributes: {},
+          parentURL: from
+        });
+        await log('resolver', resolved, '->', res);
         return {
-          url: pathToFileURL(resolved).href,
-          shortCircuit: true,
-        };
+          id: res.url,
+        }
+      } catch (e) {
+        console.error(e);
+        return null;
       }
     }
+  };
+  const res = await emberResolver.resolveId.call(emberResolverContext, specifier, context.parentURL || path.resolve('./package.json'), {});
+  if (res) {
+    return nextResolve(res.id, context);
   }
-
-  // Handle ember imports
-  if (specifier === 'ember') {
-    const basePath = resolvePath(emberSourcePath, 'ember');
-    const resolved = tryExtensions(basePath);
-    if (resolved) {
-      return {
-        url: pathToFileURL(resolved).href,
-        shortCircuit: true,
-      };
-    }
-  }
-
-  // Handle relative/absolute imports with extension checking
-  if (specifier.startsWith('./') || specifier.startsWith('../') || specifier.startsWith('/')) {
-    const parentURL = context.parentURL ? fileURLToPath(context.parentURL) : __dirname;
-    const parentDir = dirname(parentURL);
-    const basePath = resolvePath(parentDir, specifier);
-
-    // Try to resolve with multiple extensions
-    const resolved = tryExtensions(basePath);
-    if (resolved) {
-      return {
-        url: pathToFileURL(resolved).href,
-        shortCircuit: true,
-      };
-    }
-  }
-
-  // Let Node.js handle all other specifiers
   return nextResolve(specifier, context);
 }
 
 export async function load(url, context, nextLoad) {
-	let filePath = url;
-	try {
-		filePath = fileURLToPath(url);
-		filePath = realpathSync(filePath);
-	} catch (e) {
+  let filePath = url;
+  try {
+    filePath = fileURLToPath(url);
+    filePath = realpathSync(filePath);
+  } catch (e) {
 
-	}
+  }
+  let content = emberResolver.load(filePath);
+  if (existsSync(filePath)) {
+    content = readFileSync(filePath, 'utf8');
+  }
+  content = emberTemplateTag.transform(content, filePath)?.code || content;
 
-  // Check if file needs transpilation
-  if (filePath.endsWith('.ts') || filePath.endsWith('.gts') || filePath.endsWith('.js')) {
-    // Skip node_modules except for specific cases
-    if (filePath.includes('node_modules') && !filePath.includes('ember-source')) {
-      return nextLoad(url, context);
-    }
+  if (!content) {
+    return nextLoad(url, context);
+  }
 
-    // Set format to 'module' for .gts files to prevent format detection error
-    if (filePath.endsWith('.gts')) {
-      context = { ...context, format: 'module' };
-    }
+  const result = transformSync(content, {
+    ...babelConfig,
+    filename: filePath,
+    sourceMaps: 'inline',
+  });
 
-    try {
-      let source = readFileSync(filePath, 'utf-8');
-      let processedFilename = filePath;
-
-      // Pre-process .gts files with content-tag first
-      if (filePath.endsWith('.gts')) {
-        try {
-          const processed = contentTagProcessor.process(source, { inline_source_map: true });
-          source = processed.code;
-          // Change filename to .ts for Babel to process it correctly
-          processedFilename = filePath.replace(/\.gts$/, '.ts');
-        } catch (contentTagError) {
-          console.error(`Error processing content-tag for ${filePath}:`, contentTagError.message);
-          throw contentTagError;
-        }
-      }
-
-      // Transpile with Babel
-      const result = transformSync(source, {
-        ...babelConfig,
-        filename: processedFilename,
-        sourceMaps: 'inline',
-      });
-
-      if (result && result.code) {
-        return {
-          format: 'module',
-          source: result.code,
-          shortCircuit: true,
-        };
-      }
-    } catch (error) {
-      console.error(`Error transpiling ${filePath}:`, error.message);
-      if (error.stack) {
-        console.error(error.stack);
-      }
-      throw error;
-    }
+  if (result && result.code) {
+    return {
+      format: 'module',
+      source: result.code,
+      shortCircuit: true,
+    };
   }
 
   // Let Node.js handle all other files
