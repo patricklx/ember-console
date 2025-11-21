@@ -89,15 +89,7 @@ describe('findDiffSegments', () => {
       [
         {
           "start": 0,
-          "text": "[32m[1mC",
-        },
-        {
-          "start": 2,
-          "text": "[32m[1mlors Demo",
-        },
-        {
-          "start": 12,
-          "text": "[32m[1mView",
+          "text": "[32m[1mColors Demo View",
         },
         {
           "start": 16,

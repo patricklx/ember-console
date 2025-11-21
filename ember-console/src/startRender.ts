@@ -317,18 +317,51 @@ const segments: TextSegment[] = [];
       }
     } else {
       // Position matches (both char and state are identical)
-      // Close any open segment
       if (currentSegmentStart !== -1) {
-        // Only add segment if we have accumulated text
-        if (currentSegmentText.length > 0) {
-          segments.push({
-            start: currentSegmentStart,
-            text: currentSegmentAnsiState + currentSegmentText
-          });
+        // We have an open segment and current position matches
+        // Check if we should include this matching character or close the segment
+        
+        // Look ahead to find the next difference
+        let foundNextDiff = false;
+        let nextDiffHasSameState = false;
+        
+        for (let lookAhead = visualPos + 1; lookAhead < maxVisualLength; lookAhead++) {
+          const nextOldRange = oldRanges.find(r => lookAhead >= r.visualStart && lookAhead < r.visualEnd);
+          const nextNewRange = newRanges.find(r => lookAhead >= r.visualStart && lookAhead < r.visualEnd);
+          
+          const nextOldChar = nextOldRange ? nextOldRange.text[lookAhead - nextOldRange.visualStart] : undefined;
+          const nextNewChar = nextNewRange ? nextNewRange.text[lookAhead - nextNewRange.visualStart] : undefined;
+          const nextOldState = nextOldRange ? nextOldRange.ansiState : '';
+          const nextNewState = nextNewRange ? nextNewRange.ansiState : '';
+          
+          const nextCharMatches = nextOldChar === nextNewChar;
+          const nextStateMatches = nextOldState === nextNewState;
+          
+          if (!nextCharMatches || !nextStateMatches) {
+            // Found another difference
+            foundNextDiff = true;
+            nextDiffHasSameState = (nextNewState === currentSegmentAnsiState);
+            break;
+          }
         }
-        currentSegmentStart = -1;
-        currentSegmentText = '';
-        currentSegmentAnsiState = '';
+        
+        if (foundNextDiff && nextDiffHasSameState) {
+          // Next diff has same state, include this matching char and keep segment open
+          if (newChar !== undefined) {
+            currentSegmentText += newChar;
+          }
+        } else {
+          // Close the segment
+          if (currentSegmentText.length > 0) {
+            segments.push({
+              start: currentSegmentStart,
+              text: currentSegmentAnsiState + currentSegmentText
+            });
+          }
+          currentSegmentStart = -1;
+          currentSegmentText = '';
+          currentSegmentAnsiState = '';
+        }
       }
     }
   }
@@ -339,6 +372,27 @@ const segments: TextSegment[] = [];
       start: currentSegmentStart,
       text: currentSegmentAnsiState + currentSegmentText
     });
+  }
+  
+  // Get visual lengths to check if old text is longer
+  const oldVisualLength = oldRanges.length > 0 ? oldRanges[oldRanges.length - 1].visualEnd : 0;
+  const newVisualLength = newRanges.length > 0 ? newRanges[newRanges.length - 1].visualEnd : 0;
+  
+  // If old text is longer, we need to clear the remaining characters
+  // But only add a segment if we haven't already covered this position
+  // and if the last segment doesn't already extend to or past this position
+  if (oldVisualLength > newVisualLength && segments.length > 0) {
+    const lastSegment = segments[segments.length - 1];
+    const lastSegmentVisualEnd = lastSegment.start + getVisualLength(lastSegment.text);
+    
+    // Only add empty segment if the last segment doesn't reach the new visual length
+    // This avoids unnecessary empty segments when the last segment already covers the position
+    if (lastSegmentVisualEnd < newVisualLength) {
+      segments.push({
+        start: newVisualLength,
+        text: ''
+      });
+    }
   }
   
   // Check if there are trailing ANSI codes after the last visual character
@@ -352,14 +406,24 @@ const segments: TextSegment[] = [];
     .map(t => t.value)
     .join('');
   
+  // Only add trailing ANSI segment if they differ and there's actual content
   if (oldTrailingAnsi !== newTrailingAnsi && newTrailingAnsi) {
-    // Add a segment for the trailing ANSI codes
-    const lastRange = newRanges[newRanges.length - 1];
-    const lastAnsiState = lastRange ? lastRange.ansiState : '';
-    segments.push({
-      start: maxVisualLength,
-      text: lastAnsiState + newTrailingAnsi
-    });
+    // Check if we already have a segment at maxVisualLength
+    const existingSegment = segments.find(s => s.start === maxVisualLength);
+    if (existingSegment) {
+      // Append to existing segment
+      const lastRange = newRanges[newRanges.length - 1];
+      const lastAnsiState = lastRange ? lastRange.ansiState : '';
+      existingSegment.text = lastAnsiState + newTrailingAnsi;
+    } else {
+      // Add a new segment for the trailing ANSI codes
+      const lastRange = newRanges[newRanges.length - 1];
+      const lastAnsiState = lastRange ? lastRange.ansiState : '';
+      segments.push({
+        start: maxVisualLength,
+        text: lastAnsiState + newTrailingAnsi
+      });
+    }
   }
   
   return segments;
