@@ -7,7 +7,9 @@ import { Text } from 'ember-console';
 export default class ColorsTemplate extends Component {
 	<template>
 		<Text @bold={{true}} @color="green">Colors Demo View</Text>
-		<Text>Hello from ember-console!</Text>
+		<Text>
+			Hello from ember-console!
+		</Text>
 
 		{{! Colored text }}
 		<Text @color="green">This text is green</Text>

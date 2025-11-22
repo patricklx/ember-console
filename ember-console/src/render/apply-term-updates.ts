@@ -57,6 +57,13 @@ function clearLineFromCursor(): void {
 }
 
 /**
+ * Clear from cursor to start of line
+ */
+function clearLineToStart(): void {
+	readline.clearLine(process.stdout, -1); // Clear from cursor to start
+}
+
+/**
  * Clear entire line
  */
 function clearEntireLine(): void {
@@ -521,24 +528,42 @@ function updateLineMinimal(line: number, oldText: string, newText: string): void
 	const oldVisualLength = getVisualLength(oldText);
 	const newVisualLength = getVisualLength(newText);
 
+	// If new line is empty, clear the entire line and return
+	if (newVisualLength === 0 && oldVisualLength > 0) {
+		readline.cursorTo(process.stdout, 0, line);
+		clearEntireLine();
+		return;
+	}
+
 	// Apply each segment update
-	for (const segment of segments) {
+	for (let i = 0; i < segments.length; i++) {
+		const segment = segments[i];
+		const isFirstSegment = i === 0;
+		const isLastSegment = i === segments.length - 1;
+
 		// Move cursor to the visual position of the changed segment
 		readline.cursorTo(process.stdout, segment.start, line);
 
-		// If this is the last segment and new text is visually shorter, clear to end of line
-		const isLastSegment = segment === segments[segments.length - 1];
+		// Optimize clearing strategy based on segment position
 		const segmentVisualLength = getVisualLength(segment.text);
-		const needsClear = isLastSegment && (segment.start + segmentVisualLength < oldVisualLength);
+		const segmentEndPos = segment.start + segmentVisualLength;
 
-		if (needsClear) {
+		// If first segment starts at position 0 and has content, clear left first
+		if (isFirstSegment && segment.start === 0 && segment.text.length > 0) {
+			clearLineToStart();
+		}
+
+		// If this is the last segment and new text is visually shorter, clear to end of line
+		const needsClearRight = isLastSegment && segmentEndPos < oldVisualLength;
+
+		if (needsClearRight) {
 			clearLineFromCursor();
 		}
 
 		// Write the new text for this segment (including any ANSI codes)
 		if (segment.text.length > 0) {
 			process.stdout.write(segment.text);
-		} else if (needsClear) {
+		} else if (needsClearRight) {
 			// Just clearing, no text to write
 		}
 	}

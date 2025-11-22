@@ -80,7 +80,7 @@ export class TerminaTextElement extends ElementNode {
       .join('');
     const preFormated = this.getAttribute('pre-formated');
     if (!preFormated) {
-      t = t.split('\n').map((line) => line.trim()).join('\n');
+      t = t.split('\n').map((line) => line.trim()).filter(Boolean).join('\n');
     }
     this.text = this.transform(t);
   }
