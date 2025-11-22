@@ -82,7 +82,6 @@ export type OutputTransformer = (text: string) => string;
  * Represents a styled container or text element
  */
 export default class TerminalElementNode extends ElementNode {
-  tagName: string;
   style: TerminalStyles = {};
   yogaNode?: YogaNode;
   internal_transform?: OutputTransformer;
@@ -96,10 +95,8 @@ export default class TerminalElementNode extends ElementNode {
   onImmediateRender?: () => void;
 
   constructor(tagName: string) {
-    super();
-    this.nodeType = 1; // ELEMENT_NODE
-    this.nodeName = tagName;
-    this.tagName = tagName;
+    super(tagName);
+    this.nodeType = 1;
   }
 
   /**

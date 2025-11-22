@@ -6,7 +6,6 @@
 // Export setup and render
 export { setup } from './setup.js';
 export { startRender } from './startRender';
-export type { RenderOptions, RenderInstance } from './startRender';
 
 export { default as DocumentNode } from './dom/nodes/DocumentNode';
 export { default as Text } from './components/Text.gts';

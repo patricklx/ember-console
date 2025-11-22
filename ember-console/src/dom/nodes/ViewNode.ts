@@ -1,4 +1,5 @@
 import DocumentNode from './DocumentNode.ts';
+import { getViewMeta } from "../element-registry";
 
 function* elementIterator(el: any): Generator<any, void, unknown> {
   yield el;
