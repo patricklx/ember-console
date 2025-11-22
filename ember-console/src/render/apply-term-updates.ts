@@ -6,6 +6,7 @@
 import ElementNode from "../dom/nodes/ElementNode";
 import { extractLines } from "./collect-lines";
 import * as readline from "node:readline";
+import { DocumentNode } from "../index";
 
 export interface RenderOptions {
 	/**
@@ -573,7 +574,6 @@ export function render(rootNode: ElementNode): void {
 	// If scroll buffer changed, clear everything and redraw
 	if (needsFullRedraw) {
 		clearScreen();
-		process.stdout.write('\x1b[?25l'); // Hide cursor
 		try {
 			for (let i = 0; i < newLines.length; i++) {
 				if (i > 0) {
@@ -662,7 +662,7 @@ export function clearScreen(): void {
 /**
  * Handle terminal resize
  */
-function handleResize(document: DocumentNode): void {
+export function handleResize(document: DocumentNode): void {
 	const newHeight = process.stdout.rows || 24;
 	const newWidth = process.stdout.columns || 80;
 
