@@ -9,4 +9,3 @@ export { startRender } from './startRender';
 
 export { default as DocumentNode } from './dom/nodes/DocumentNode';
 export { default as Text } from './components/Text.gts';
-// Note: Text component will be exported once Glimmer VM integration is complete

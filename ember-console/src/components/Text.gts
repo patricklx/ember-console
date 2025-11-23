@@ -12,7 +12,7 @@ interface TextSignature {
     underline?: boolean;
     strikethrough?: boolean;
     inverse?: boolean;
-    preFormated?: boolean;
+		preFormatted?: boolean;
     wrap?: 'wrap' | 'truncate' | 'truncate-start' | 'truncate-middle' | 'truncate-end';
   };
   Blocks: {
@@ -20,6 +20,7 @@ interface TextSignature {
   };
   Element: HTMLElement;
 }
+
 
 /**
  * Text component for terminal rendering
@@ -37,7 +38,7 @@ export default class Text extends Component<TextSignature> {
       strikethrough={{@strikethrough}}
       inverse={{@inverse}}
       wrap={{@wrap}}
-      pre-formated={{@preFormated}}
+      pre-formatted={{@preFormatted}}
       ...attributes
     >{{yield}}</terminal-text>
   </template>

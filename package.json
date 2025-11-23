@@ -1,0 +1,5 @@
+{
+	"devDependencies": {
+		"@glint/tsserver-plugin": "^2.0.8"
+	}
+}
