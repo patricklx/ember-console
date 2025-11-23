@@ -58,6 +58,7 @@ export function setup() {
     origin: '',
     protocol: 'terminal:',
   };
+	document.location = g.location = g.window.location;
 
   // Stub for MouseEvent (not used in terminal but needed for Ember)
   class MouseEvent {

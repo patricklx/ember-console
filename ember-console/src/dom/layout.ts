@@ -19,9 +19,9 @@ function createYogaNode(element: ElementNode): YogaNode {
 	// Apply individual style attributes
 	const styles: Partial<Styles> = {};
 	
-	// Flexbox properties
-	if (element.hasAttribute('flexDirection')) {
-		styles.flexDirection = element.getAttribute('flexDirection') as any;
+	// Flexbox properties (check both camelCase and kebab-case)
+	if (element.hasAttribute('flexDirection') || element.hasAttribute('flex-direction')) {
+		styles.flexDirection = (element.getAttribute('flexDirection') || element.getAttribute('flex-direction')) as any;
 	}
 	if (element.hasAttribute('flexGrow')) {
 		styles.flexGrow = Number(element.getAttribute('flexGrow'));

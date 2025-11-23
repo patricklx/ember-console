@@ -98,22 +98,28 @@ export default class Output {
 	}
 
 	get(): {output: string; height: number} {
-		// Initialize output array with a specific set of rows, so that margin/padding at the bottom is preserved
+		// Initialize output array - start with terminal height but allow growth
 		const output: StyledChar[][] = [];
-
-		for (let y = 0; y < this.height; y++) {
-			const row: StyledChar[] = [];
-
-			for (let x = 0; x < this.width; x++) {
-				row.push({
-					type: 'char',
-					value: ' ',
-					fullWidth: false,
-					styles: [],
-				});
+		
+		// Helper function to ensure row exists
+		const ensureRow = (y: number) => {
+			while (output.length <= y) {
+				const row: StyledChar[] = [];
+				for (let x = 0; x < this.width; x++) {
+					row.push({
+						type: 'char',
+						value: ' ',
+						fullWidth: false,
+						styles: [],
+					});
+				}
+				output.push(row);
 			}
+		};
 
-			output.push(row);
+		// Pre-initialize rows up to terminal height for margin/padding preservation
+		for (let y = 0; y < this.height; y++) {
+			ensureRow(y);
 		}
 
 		const clips: Clip[] = [];
@@ -189,12 +195,9 @@ export default class Output {
 				let offsetY = 0;
 
 				for (let [index, line] of lines.entries()) {
+					// Ensure row exists (allows growth beyond initial height)
+					ensureRow(y + offsetY);
 					const currentLine = output[y + offsetY];
-
-					// Line can be missing if `text` is taller than height of pre-initialized `this.output`
-					if (!currentLine) {
-						continue;
-					}
 
 					for (const transformer of transformers) {
 						line = transformer(line, index);

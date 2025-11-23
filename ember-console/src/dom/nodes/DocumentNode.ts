@@ -17,6 +17,7 @@ class HeadNode extends ElementNode {
     super(tagName);
     this.document = document;
   }
+	append = this.appendChild;
   appendChild(childNode: ViewNode) {
     if (childNode.tagName === 'style') {
       this.document.page.nativeView.addCss(

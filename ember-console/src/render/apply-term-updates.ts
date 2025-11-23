@@ -52,21 +52,21 @@ function moveCursorTo(line: number): void {
 /**
  * Clear from cursor to end of line
  */
-function clearLineFromCursor(): void {
+export function clearLineFromCursor(): void {
 	readline.clearLine(process.stdout, 1); // Clear from cursor to end
 }
 
 /**
  * Clear from cursor to start of line
  */
-function clearLineToStart(): void {
+export function clearLineToStart(): void {
 	readline.clearLine(process.stdout, -1); // Clear from cursor to start
 }
 
 /**
  * Clear entire line
  */
-function clearEntireLine(): void {
+export function clearEntireLine(): void {
 	readline.clearLine(process.stdout, 0); // Clear entire line
 }
 
@@ -548,8 +548,12 @@ function updateLineMinimal(line: number, oldText: string, newText: string): void
 		const segmentVisualLength = getVisualLength(segment.text);
 		const segmentEndPos = segment.start + segmentVisualLength;
 
-		// If first segment starts at position 0 and has content, clear left first
-		if (isFirstSegment && segment.start === 0 && segment.text.length > 0) {
+		// Reset any previous styling (background colors, etc.) before writing new content
+		// This ensures old backgrounds don't persist
+		process.stdout.write('\x1b[0m');
+
+		// If first segment starts at position 0, clear from start to ensure no leftover content
+		if (isFirstSegment && segment.start === 0) {
 			clearLineToStart();
 		}
 

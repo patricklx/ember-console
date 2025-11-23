@@ -2,9 +2,7 @@ import { babel } from '@rollup/plugin-babel';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
 import json from '@rollup/plugin-json';
-import fs from 'fs';
 import path from 'path';
-import { fileURLToPath } from 'url';
 import { resolver, templateTag } from '@embroider/vite';
 
 export default {
