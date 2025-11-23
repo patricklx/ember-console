@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 import {type Boxes, type BoxStyle} from 'cli-boxes';
 import {type LiteralUnion} from 'type-fest';
-import {type ForegroundColorName} from 'type-fest'; // Note: We import directly from `ansi-styles` to avoid a bug in TypeScript.
 import Yoga, {type Node as YogaNode} from 'yoga-layout';
+import { type ForegroundColorName } from "chalk";
 
 export type Styles = {
 	readonly textWrap?:
