@@ -19,8 +19,10 @@ export function startRender(
   const stdout = process.stdout;
   const stdin = process.stdin;
 
-  // Set up raw mode for input
-  stdin.setRawMode(true);
+  // Set up raw mode for input (only if stdin is a TTY)
+  if (stdin.isTTY && typeof stdin.setRawMode === 'function') {
+    stdin.setRawMode(true);
+  }
   stdin.resume();
   stdin.setEncoding('utf8');
 

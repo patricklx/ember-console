@@ -5,10 +5,10 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "start": "node --loader ./loader.mjs app/index.ts",
+    "start": "node --enable-source-maps --loader ./loader.mjs app/index.ts",
     "dev": "rollup -c -w",
     "build": "rollup -c",
-	  "type": "ember-tsc -c"
+    "type": "ember-tsc -c"
   },
   "exports": {
     "./*": "./app/*"
@@ -44,6 +44,7 @@
     "content-tag": "^4.0.0",
     "decorator-transforms": "^2.0.0",
     "ember-compatibility-helpers": "^1.2.7",
+    "indent-string": "^5.0.0",
     "jimp": "^1.6.0",
     "rollup": "^4.9.0",
     "tsx": "^4.7.0",

@@ -1,5 +1,5 @@
 import Component from '@glimmer/component';
-import { Text } from 'ember-console';
+import { Text, Box } from 'ember-console';
 import { tracked } from "@glimmer/tracking";
 import { service } from '@ember/service';
 import type RouterService from '@ember/routing/router-service';
@@ -12,14 +12,13 @@ const eq = (a, b) => a === b;
  */
 export default class AppTemplate extends Component {
 	@service declare router: RouterService;
-	@tracked selectedView: 'colors' | 'lorem' | 'tomster' = 'colors';
+	@tracked selectedView: 'colors' | 'lorem' | 'tomster' | 'box-demo' = 'colors';
   @tracked counter = 0;
   @tracked debug = [];
 
   get debugMessages() {
     return this.debug.join('\n');
   }
-
 	constructor(owner: unknown, args: object) {
 		super(owner, args);
 
@@ -34,6 +33,22 @@ export default class AppTemplate extends Component {
 
 		// Navigate to initial route
 		this.router.transitionTo('colors');
+
+		// Auto-switch views for demo
+		setTimeout(() => {
+			this.selectedView = 'lorem';
+			this.router.transitionTo('lorem');
+		}, 3000);
+
+		setTimeout(() => {
+			this.selectedView = 'tomster';
+			this.router.transitionTo('tomster');
+		}, 6000);
+
+		setTimeout(() => {
+			this.selectedView = 'box-demo';
+			this.router.transitionTo('box-demo');
+		}, 9000);
 	}
 
 	willDestroy() {
@@ -56,18 +71,24 @@ export default class AppTemplate extends Component {
 		} else if (key === '3') {
 			this.selectedView = 'tomster';
 			this.router.transitionTo('tomster');
+		} else if (key === '4') {
+			this.selectedView = 'box-demo';
+			this.router.transitionTo('box-demo');
 		}
 	}
 
 	<template>
-    <Text>
-      {{this.debugMessages}}
-    </Text>
-		<Text @bold={{true}} @color="cyan">Select a view (press 1, 2, or 3): {{this.selectedView}}</Text>
-		<Text @color={{if (eq this.selectedView "colors") "green" "white"}}>[1] Colors Demo</Text>
-		<Text @color={{if (eq this.selectedView "lorem") "green" "white"}}>[2] Lorem Ipsum Generator</Text>
-		<Text @color={{if (eq this.selectedView "tomster") "green" "white"}}>[3] Ember Tomster ASCII Art</Text>
-		<Text>---</Text>
-		{{outlet}}
+    <Box @flexDirection="column" @overflow="visible">
+      <Text>
+        {{this.debugMessages}}
+      </Text>
+      <Text @bold={{true}} @color="cyan">Select a view (press 1, 2, 3, or 4): {{this.selectedView}}</Text>
+      <Text @color={{if (eq this.selectedView "colors") "green" "white"}}>[1] Colors Demo</Text>
+      <Text @color={{if (eq this.selectedView "lorem") "green" "white"}}>[2] Lorem Ipsum Generator</Text>
+      <Text @color={{if (eq this.selectedView "tomster") "green" "white"}}>[3] Ember Tomster ASCII Art</Text>
+      <Text @color={{if (eq this.selectedView "box-demo") "green" "white"}}>[4] Box Layout Demo</Text>
+      <Text>---</Text>
+      {{outlet}}
+    </Box>
 	</template>
 }

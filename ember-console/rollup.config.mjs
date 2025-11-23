@@ -1,12 +1,13 @@
 import { nodeResolve } from '@rollup/plugin-node-resolve';
 import { babel } from '@rollup/plugin-babel';
+import json from '@rollup/plugin-json';
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import ContentTag from 'content-tag';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // Content-tag preprocessor for .gts files
-import ContentTag from 'content-tag';
-import path from "node:path";
-import { fileURLToPath } from "node:url";
 const Preprocessor = new ContentTag.Preprocessor();
 
 // Plugin to preprocess .gts files
@@ -44,6 +45,7 @@ export default {
     'yoga-layout',
   ],
   plugins: [
+		json(),
 		gtsPreprocessor(),
     nodeResolve({
       extensions: ['.ts', '.js', '.gts', '.gjs'],

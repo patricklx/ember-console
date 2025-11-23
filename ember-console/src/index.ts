@@ -9,3 +9,4 @@ export { startRender } from './startRender';
 
 export { default as DocumentNode } from './dom/nodes/DocumentNode';
 export { default as Text } from './components/Text.gts';
+export { default as Box } from './components/Box.gts';

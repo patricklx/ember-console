@@ -11,4 +11,5 @@ Router.map(function () {
   this.route('colors');
   this.route('lorem');
   this.route('tomster');
+  this.route('box-demo');
 });

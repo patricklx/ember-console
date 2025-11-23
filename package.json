@@ -1,5 +1,17 @@
 {
 	"devDependencies": {
-		"@glint/tsserver-plugin": "^2.0.8"
+		"@glint/tsserver-plugin": "^2.0.8",
+		"@rollup/plugin-json": "^6.1.0"
+	},
+	"dependencies": {
+		"@alcalzone/ansi-tokenize": "^0.2.2",
+		"slice-ansi": "^7.1.2",
+		"string-width": "^8.1.0",
+		"widest-line": "^5.0.0"
+	},
+	"pnpm": {
+		"overrides": {
+			"string-width": "^8.1.0"
+		}
 	}
 }

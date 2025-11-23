@@ -1,12 +1,12 @@
 /**
- * Render function for Ember-Ink
- * Renders Glimmer components to terminal output
+ * Render function for Ember-Console
+ * Renders components to terminal output using layout-based rendering
  */
 
 import ElementNode from "../dom/nodes/ElementNode";
-import { extractLines } from "./collect-lines";
+import { extractLines } from "./collect-lines.js";
 import * as readline from "node:readline";
-import { DocumentNode } from "../index";
+import { DocumentNode } from "../index.js";
 
 export interface RenderOptions {
 	/**
@@ -572,10 +572,8 @@ function updateLineMinimal(line: number, oldText: string, newText: string): void
 	process.stdout.write('\x1b[0m');
 }
 
-
-
 /**
- * Render with line-by-line diffing
+ * Render with line-by-line diffing using layout-based rendering
  */
 export function render(rootNode: ElementNode): void {
 	const newLines = extractLines(rootNode);
@@ -690,12 +688,10 @@ export function clearScreen(): void {
 export function handleResize(document: DocumentNode): void {
 	const newHeight = process.stdout.rows || 24;
 	const newWidth = process.stdout.columns || 80;
-
 	// Check if dimensions actually changed
 	if (newHeight !== state.terminalHeight || newWidth !== state.terminalWidth) {
 		state.terminalHeight = newHeight;
 		state.terminalWidth = newWidth;
-
 		// Clear and force full re-render on resize
 		clearScreen();
 		// The next render cycle will redraw everything

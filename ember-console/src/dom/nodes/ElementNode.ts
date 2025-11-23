@@ -3,6 +3,9 @@
 // import { CssAnimationParser } from '@nativescript/core/ui/styling/css-animation-parser';
 import PropertyNode from './PropertyNode.ts';
 import ViewNode from './ViewNode.ts';
+import {type Node as YogaNode} from 'yoga-layout';
+import {updateYogaNodeStyles} from '../layout.ts';
+import type {Styles} from '../styles.ts';
 
 // import { getViewClass } from '../element-registry';
 // import ViewNode from './ViewNode';
@@ -223,6 +226,38 @@ export interface IClassList {
 export default class ElementNode<Attributes = any> extends ViewNode<Attributes> {
   declare _classList: IClassList;
   declare _id: string;
+  yogaNode?: YogaNode;
+  
+  /**
+   * Override setAttribute to update Yoga styles when style attributes change
+   */
+  setAttribute(key: string, value: any): void {
+    super.setAttribute(key, value);
+    
+    // Update Yoga node if this is a style-related attribute
+    if (this.yogaNode && this.isStyleAttribute(key)) {
+      const styles: Partial<Styles> = {};
+      styles[key as keyof Styles] = value;
+      updateYogaNodeStyles(this, styles as Styles);
+    }
+  }
+  
+  /**
+   * Check if an attribute affects Yoga layout
+   */
+  private isStyleAttribute(key: string): boolean {
+    const styleAttributes = [
+      'flexDirection', 'flexGrow', 'flexShrink', 'flexBasis', 'flexWrap',
+      'alignItems', 'alignSelf', 'justifyContent',
+      'width', 'height', 'minWidth', 'minHeight',
+      'margin', 'marginX', 'marginY', 'marginTop', 'marginBottom', 'marginLeft', 'marginRight',
+      'padding', 'paddingX', 'paddingY', 'paddingTop', 'paddingBottom', 'paddingLeft', 'paddingRight',
+      'gap', 'columnGap', 'rowGap',
+      'position', 'display',
+      'borderStyle', 'borderTop', 'borderBottom', 'borderLeft', 'borderRight'
+    ];
+    return styleAttributes.includes(key);
+  }
   static ELEMENT_NODE: number;
   static ATTRIBUTE_NODE: number;
   static TEXT_NODE: number;
@@ -298,6 +333,14 @@ export default class ElementNode<Attributes = any> extends ViewNode<Attributes> 
     if (childNode.nodeType === 7) {
       (childNode as PropertyNode).setOnNode(this);
     }
+    
+    // Update Yoga tree when child is added
+    if (childNode.nodeType === 1 && this.yogaNode) {
+      const childElement = childNode as ElementNode;
+      if (childElement.yogaNode) {
+        this.yogaNode.insertChild(childElement.yogaNode, this.childNodes.length - 1);
+      }
+    }
   }
 
   insertBefore(childNode: ViewNode, referenceNode: ViewNode) {
@@ -306,9 +349,26 @@ export default class ElementNode<Attributes = any> extends ViewNode<Attributes> 
     if (childNode.nodeType === 7) {
       (childNode as PropertyNode).setOnNode(this);
     }
+    
+    // Update Yoga tree when child is inserted
+    if (childNode.nodeType === 1 && this.yogaNode) {
+      const childElement = childNode as ElementNode;
+      const index = this.childNodes.indexOf(childNode);
+      if (childElement.yogaNode && index >= 0) {
+        this.yogaNode.insertChild(childElement.yogaNode, index);
+      }
+    }
   }
 
   removeChild(childNode: ViewNode) {
+    // Remove from Yoga tree before removing from DOM
+    if (childNode.nodeType === 1 && this.yogaNode) {
+      const childElement = childNode as ElementNode;
+      if (childElement.yogaNode) {
+        this.yogaNode.removeChild(childElement.yogaNode);
+      }
+    }
+    
     super.removeChild(childNode);
 
     if (childNode.nodeType === 7) {
