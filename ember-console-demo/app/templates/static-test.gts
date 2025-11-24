@@ -46,7 +46,7 @@ export default class StaticTest extends Component {
   }
 
   <template>
-    <Box flexDirection="column">
+    <Box flexDirection="column" @overflow="visible">
       {{! Static section - tasks that don't change once rendered }}
       <Static @items={{this.tasks}}>
         <:default as |task|>

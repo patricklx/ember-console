@@ -19,6 +19,7 @@ export default class ElementNode<Attributes = any> extends ViewNode<Attributes> 
   declare _classList: IClassList;
   declare _id: string;
   yogaNode?: YogaNode;
+	staticRendered?: Boolean;
 
   /**
    * Override setAttribute to update Yoga styles when style attributes change

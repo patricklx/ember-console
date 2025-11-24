@@ -79,22 +79,26 @@ export function extractLines(rootNode: ElementNode): string[] {
 		}
 	}
 
+	calculateLayout(rootNode, terminalWidth, terminalHeight);
+
+	const height = rootNode.childNodes.map(c => c.yogaNode?.getComputedHeight() || 0).reduce((x, y) => x + y, 0);
+
 	// Create output buffer with terminal dimensions, offset by static content
 	const output = new Output({
-		width: terminalWidth,
-		height: terminalHeight,
+		width: rootNode.yogaNode?.getComputedWidth(),
+		height: height,
 	});
 
 	// Render the node tree to the output buffer, skipping static elements
 	renderNodeToOutput(rootNode, output, {
 		offsetX: 0,
-		offsetY: 0,
+		offsetY: staticOutputCache.length,
 		transformers: [],
 		skipStaticElements: true,
 	});
 
 	// Extract the final output
-	const {output: renderedOutput} = output.get();
+	const { output: renderedOutput } = output.get();
 
 	// Convert to lines
 	const dynamicLines = renderedOutput.split('\n');
