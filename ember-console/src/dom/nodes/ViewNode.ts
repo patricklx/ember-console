@@ -293,4 +293,8 @@ export default class ViewNode<Attributes = any> {
   } | null {
     return null;
   }
+
+	remove() {
+		this.parentNode?.removeChild(this);
+	}
 }

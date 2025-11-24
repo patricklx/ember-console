@@ -167,8 +167,4 @@ export default class ElementNode<Attributes = any> extends ViewNode<Attributes> 
       (childNode as PropertyNode).clearOnNode(this);
     }
   }
-
-	remove() {
-		this.parentNode?.removeChild(this);
-	}
 }

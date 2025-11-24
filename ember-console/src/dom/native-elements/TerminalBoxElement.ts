@@ -82,8 +82,6 @@ interface Attributes {
 }
 
 export class TerminalBoxElement extends ElementNode<Attributes> {
-  private staticChildren: ElementNode[] = [];
-  private isStaticElement = false;
 
   constructor() {
     super('terminal-box');
@@ -121,18 +119,6 @@ export class TerminalBoxElement extends ElementNode<Attributes> {
    * and handle static children
    */
   appendChild(child: any) {
-    // For static elements, check if child already exists in staticChildren
-    if (this.isStaticElement && child instanceof ElementNode) {
-      const existingIndex = this.staticChildren.findIndex(c => c === child);
-      if (existingIndex === -1) {
-        // New child - add to static children and allow normal append
-        this.staticChildren.push(child);
-      } else {
-        // Already rendered - skip the append
-        return child;
-      }
-    }
-
     super.appendChild(child);
 
     const backgroundColor = this.getAttribute('background-color');
@@ -147,22 +133,6 @@ export class TerminalBoxElement extends ElementNode<Attributes> {
    * Override removeChild to prevent removal of static children
    */
   removeChild(child: any) {
-    // For static elements, prevent removal of static children
-    if (this.isStaticElement && child instanceof ElementNode) {
-      const staticIndex = this.staticChildren.indexOf(child);
-      if (staticIndex !== -1) {
-        // This is a static child - don't remove it
-        return child;
-      }
-    }
-
     return super.removeChild(child);
-  }
-
-  /**
-   * Get only static children
-   */
-  getStaticChildren(): ElementNode[] {
-    return this.staticChildren;
   }
 }

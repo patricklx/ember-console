@@ -48,12 +48,10 @@ export default class StaticTest extends Component {
   <template>
     <Box flexDirection="column">
       {{! Static section - tasks that don't change once rendered }}
-      <Static>
-        {{#each this.tasks as |task|}}
-          <Box key={{task.id}}>
-            <Text color={{this.randomColor}}>✔ {{task.title}}</Text>
-          </Box>
-        {{/each}}
+      <Static @items={{this.tasks}}>
+        <:default as |task|>
+					<Text color={{this.randomColor}}>✔ {{task.title}}</Text>
+				</:default>
       </Static>
 
       {{! Dynamic section - updates continuously }}

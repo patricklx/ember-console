@@ -3,6 +3,7 @@ import { type Styles } from '../dom/styles';
 
 interface StaticSignature<T> {
   Args: {
+		items: T[];
     style?: Partial<Styles>;
   };
   Blocks: {
@@ -37,7 +38,9 @@ export default class Static<T> extends Component<StaticSignature<T>> {
       margin-right={{@style.marginRight}}
       ...attributes
     >
-      {{yield}}
+			{{#each @items key="@index" as |item|}}
+				{{yield item}}
+			{{/each}}
     </terminal-box>
   </template>
 }

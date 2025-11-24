@@ -11,9 +11,7 @@ let staticOutputCache: string[] = [];
 
 function* staticElementIterator(el: any): Generator<ElementNode, void, undefined> {
   if (el.getAttribute('internal_static')) {
-    if (!el.staticRendered) {
-      yield el;
-    }
+		yield el;
     return;
   }
   for (const child of el.childNodes) {
@@ -45,37 +43,40 @@ export function extractLines(rootNode: ElementNode): string[] {
 
   for (const element of staticElementIterator(rootNode)) {
     staticElements.push(element);
-    element.staticRendered = true;
   }
 
 	// If static elements have new children, render only the new ones and cache
 	if (staticElements.length) {
-		const staticOutput = new Output({
-			width: terminalWidth,
-			height: terminalHeight,
-		});
 
 		// Render only NEW children from static elements
 		for (const staticElement of staticElements) {
-			const allChildren = staticElement.childNodes.filter(n => n.nodeType === 1) as ElementNode[];
+			const staticOutput = new Output({
+				width: staticElement.yogaNode!.getComputedWidth(),
+				height: staticElement.yogaNode!.getComputedHeight(),
+			});
 
-			// Render only children that haven't been rendered yet
-			for (let i = 0; i < allChildren.length; i++) {
-				const child = allChildren[i];
-				renderNodeToOutput(child, staticOutput, {
-					offsetX: 0,
-					offsetY: 0,
-					transformers: [],
-					skipStaticElements: false,
-				});
+			if (!staticElement.firstElement() || staticElement.childNodes.every(c => c.staticRendered)) {
+				continue;
 			}
+
+			renderNodeToOutput(staticElement, staticOutput, {
+				offsetX: 0,
+				offsetY: 0,
+				transformers: [],
+				skipStaticElements: false,
+			});
+			const { output: staticRendered } = staticOutput.get();
+			const newStaticLines = staticRendered.split('\n');
+
+			for (const el of staticElement.childNodes) {
+				el.staticRendered = true;
+				if (el.yogaNode) {
+					staticElement.yogaNode?.removeChild(el.yogaNode);
+				}
+			}
+
+			staticOutputCache.push(...newStaticLines);
 		}
-
-		const { output: staticRendered } = staticOutput.get();
-		const newStaticLines = staticRendered.split('\n').filter(line => line.length > 0 || staticRendered.includes('\n'));
-
-		// Append new lines to cache
-		staticOutputCache.push(...newStaticLines);
 	}
 
 	// Create output buffer with terminal dimensions, offset by static content

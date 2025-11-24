@@ -9,16 +9,16 @@ import measureText from '../render/measure-text.ts';
  */
 function createYogaNode(element: ElementNode): YogaNode {
 	const yogaNode = Yoga.Node.create();
-	
+
 	// Apply styles from the element's attributes
 	const styleAttr = element.getAttribute('style');
 	if (styleAttr && typeof styleAttr === 'object') {
 		applyStyles(yogaNode, styleAttr as Styles);
 	}
-	
+
 	// Apply individual style attributes
 	const styles: Partial<Styles> = {};
-	
+
 	// Flexbox properties (check both camelCase and kebab-case)
 	if (element.hasAttribute('flexDirection') || element.hasAttribute('flex-direction')) {
 		styles.flexDirection = (element.getAttribute('flexDirection') || element.getAttribute('flex-direction')) as any;
@@ -44,7 +44,7 @@ function createYogaNode(element: ElementNode): YogaNode {
 	if (element.hasAttribute('justifyContent') || element.hasAttribute('justify-content')) {
 		styles.justifyContent = (element.getAttribute('justifyContent') || element.getAttribute('justify-content')) as any;
 	}
-	
+
 	// Dimensions
 	if (element.hasAttribute('width')) {
 		styles.width = element.getAttribute('width') as any;
@@ -64,7 +64,7 @@ function createYogaNode(element: ElementNode): YogaNode {
 	if (element.hasAttribute('maxHeight') || element.hasAttribute('max-height')) {
 		styles.maxHeight = (element.getAttribute('maxHeight') || element.getAttribute('max-height')) as any;
 	}
-	
+
 	// Spacing
 	if (element.hasAttribute('margin')) {
 		styles.margin = Number(element.getAttribute('margin'));
@@ -87,7 +87,7 @@ function createYogaNode(element: ElementNode): YogaNode {
 	if (element.hasAttribute('marginRight') || element.hasAttribute('margin-right')) {
 		styles.marginRight = Number(element.getAttribute('marginRight') || element.getAttribute('margin-right'));
 	}
-	
+
 	if (element.hasAttribute('padding')) {
 		styles.padding = Number(element.getAttribute('padding'));
 	}
@@ -109,7 +109,7 @@ function createYogaNode(element: ElementNode): YogaNode {
 	if (element.hasAttribute('paddingRight') || element.hasAttribute('padding-right')) {
 		styles.paddingRight = Number(element.getAttribute('paddingRight') || element.getAttribute('padding-right'));
 	}
-	
+
 	// Gap
 	if (element.hasAttribute('gap')) {
 		styles.gap = Number(element.getAttribute('gap'));
@@ -120,17 +120,17 @@ function createYogaNode(element: ElementNode): YogaNode {
 	if (element.hasAttribute('rowGap') || element.hasAttribute('row-gap')) {
 		styles.rowGap = Number(element.getAttribute('rowGap') || element.getAttribute('row-gap'));
 	}
-	
+
 	// Position
 	if (element.hasAttribute('position')) {
 		styles.position = element.getAttribute('position') as any;
 	}
-	
+
 	// Display
 	if (element.hasAttribute('display')) {
 		styles.display = element.getAttribute('display') as any;
 	}
-	
+
 	// Border
 	if (element.hasAttribute('borderStyle') || element.hasAttribute('border-style')) {
 		styles.borderStyle = (element.getAttribute('borderStyle') || element.getAttribute('border-style')) as any;
@@ -151,7 +151,7 @@ function createYogaNode(element: ElementNode): YogaNode {
 	if (Object.keys(styles).length > 0) {
 		applyStyles(yogaNode, styles);
 	}
-	
+
 	// Set measure function for text elements
 	if (element.tagName === 'terminal-text') {
 		yogaNode.setMeasureFunc((width) => {
@@ -163,7 +163,7 @@ function createYogaNode(element: ElementNode): YogaNode {
 			};
 		});
 	}
-	
+
 	return yogaNode;
 }
 
@@ -175,37 +175,41 @@ function buildYogaTree(node: ViewNode): void {
 	if (node.nodeType !== 1) {
 		return;
 	}
-	
+
+	if (node.staticRendered) {
+		return;
+	}
+
 	const element = node as ElementNode;
-	
+
 	// Create Yoga node if it doesn't exist
 	if (!element.yogaNode) {
 		element.yogaNode = createYogaNode(element);
 	}
-	
+
 	// terminal-text elements are leaf nodes in Yoga tree (they have measure functions)
 	// They cannot have Yoga children, but can have DOM children for text aggregation
 	if (element.tagName === 'terminal-text') {
 		return;
 	}
-	
+
 	// Process children
 	let childIndex = 0;
 	for (let i = 0; i < element.childNodes.length; i++) {
 		const child = element.childNodes[i];
-		
-		if (child && child.nodeType === 1) {
+
+		if (child && child.nodeType === 1 && !child.staticRendered) {
 			const childElement = child as ElementNode;
-			
+
 			// Build child's Yoga tree
 			buildYogaTree(childElement);
-			
+
 			// Insert child Yoga node (only if not already a child)
 			if (childElement.yogaNode && element.yogaNode) {
 				// Check if child already has a parent, remove it first
 				const childYogaNode = childElement.yogaNode;
 				const parentYogaNode = element.yogaNode;
-				
+
 				// Try to get parent - if it has one and it's different, remove it
 				try {
 					const currentParent = childYogaNode.getParent();
@@ -215,7 +219,7 @@ function buildYogaTree(node: ViewNode): void {
 				} catch (e) {
 					// getParent might not exist or child might not have parent yet
 				}
-				
+
 				// Only insert if not already a child of this parent
 				const childCount = parentYogaNode.getChildCount();
 				let alreadyChild = false;
@@ -225,7 +229,7 @@ function buildYogaTree(node: ViewNode): void {
 						break;
 					}
 				}
-				
+
 				if (!alreadyChild) {
 					parentYogaNode.insertChild(childYogaNode, childIndex);
 				}
@@ -246,12 +250,12 @@ export function calculateLayout(
 	if (rootNode.nodeType !== 1) {
 		return;
 	}
-	
+
 	const rootElement = rootNode as ElementNode;
-	
+
 	// Build or update Yoga tree
 	buildYogaTree(rootElement);
-	
+
 	// Calculate layout
 	if (rootElement.yogaNode) {
 		rootElement.yogaNode.calculateLayout(
@@ -272,7 +276,7 @@ export function updateYogaNodeStyles(
 	if (!element.yogaNode) {
 		element.yogaNode = createYogaNode(element);
 	}
-	
+
 	applyStyles(element.yogaNode, styles);
 }
 
@@ -283,14 +287,14 @@ export function cleanupYogaTree(node: ViewNode): void {
 	if (node.nodeType !== 1) {
 		return;
 	}
-	
+
 	const element = node as ElementNode;
-	
+
 	// Clean up children first
 	for (const child of element.childNodes) {
 		cleanupYogaTree(child);
 	}
-	
+
 	// Clean up this node
 	if (element.yogaNode) {
 		element.yogaNode.unsetMeasureFunc();
@@ -311,7 +315,7 @@ export function getComputedLayout(element: ElementNode): {
 	if (!element.yogaNode) {
 		return null;
 	}
-	
+
 	return {
 		left: element.yogaNode.getComputedLeft(),
 		top: element.yogaNode.getComputedTop(),
