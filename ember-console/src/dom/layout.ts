@@ -23,26 +23,26 @@ function createYogaNode(element: ElementNode): YogaNode {
 	if (element.hasAttribute('flexDirection') || element.hasAttribute('flex-direction')) {
 		styles.flexDirection = (element.getAttribute('flexDirection') || element.getAttribute('flex-direction')) as any;
 	}
-	if (element.hasAttribute('flexGrow')) {
-		styles.flexGrow = Number(element.getAttribute('flexGrow'));
+	if (element.hasAttribute('flexGrow') || element.hasAttribute('flex-grow')) {
+		styles.flexGrow = Number(element.getAttribute('flexGrow') || element.getAttribute('flex-grow'));
 	}
-	if (element.hasAttribute('flexShrink')) {
-		styles.flexShrink = Number(element.getAttribute('flexShrink'));
+	if (element.hasAttribute('flexShrink') || element.hasAttribute('flex-shrink')) {
+		styles.flexShrink = Number(element.getAttribute('flexShrink') || element.getAttribute('flex-shrink'));
 	}
-	if (element.hasAttribute('flexBasis')) {
-		styles.flexBasis = element.getAttribute('flexBasis') as any;
+	if (element.hasAttribute('flexBasis') || element.hasAttribute('flex-basis')) {
+		styles.flexBasis = (element.getAttribute('flexBasis') || element.getAttribute('flex-basis')) as any;
 	}
-	if (element.hasAttribute('flexWrap')) {
-		styles.flexWrap = element.getAttribute('flexWrap') as any;
+	if (element.hasAttribute('flexWrap') || element.hasAttribute('flex-wrap')) {
+		styles.flexWrap = (element.getAttribute('flexWrap') || element.getAttribute('flex-wrap')) as any;
 	}
-	if (element.hasAttribute('alignItems')) {
-		styles.alignItems = element.getAttribute('alignItems') as any;
+	if (element.hasAttribute('alignItems') || element.hasAttribute('align-items')) {
+		styles.alignItems = (element.getAttribute('alignItems') || element.getAttribute('align-items')) as any;
 	}
-	if (element.hasAttribute('alignSelf')) {
-		styles.alignSelf = element.getAttribute('alignSelf') as any;
+	if (element.hasAttribute('alignSelf') || element.hasAttribute('align-self')) {
+		styles.alignSelf = (element.getAttribute('alignSelf') || element.getAttribute('align-self')) as any;
 	}
-	if (element.hasAttribute('justifyContent')) {
-		styles.justifyContent = element.getAttribute('justifyContent') as any;
+	if (element.hasAttribute('justifyContent') || element.hasAttribute('justify-content')) {
+		styles.justifyContent = (element.getAttribute('justifyContent') || element.getAttribute('justify-content')) as any;
 	}
 	
 	// Dimensions
@@ -52,67 +52,73 @@ function createYogaNode(element: ElementNode): YogaNode {
 	if (element.hasAttribute('height')) {
 		styles.height = element.getAttribute('height') as any;
 	}
-	if (element.hasAttribute('minWidth')) {
-		styles.minWidth = element.getAttribute('minWidth') as any;
+	if (element.hasAttribute('minWidth') || element.hasAttribute('min-width')) {
+		styles.minWidth = (element.getAttribute('minWidth') || element.getAttribute('min-width')) as any;
 	}
-	if (element.hasAttribute('minHeight')) {
-		styles.minHeight = element.getAttribute('minHeight') as any;
+	if (element.hasAttribute('minHeight') || element.hasAttribute('min-height')) {
+		styles.minHeight = (element.getAttribute('minHeight') || element.getAttribute('min-height')) as any;
+	}
+	if (element.hasAttribute('maxWidth') || element.hasAttribute('max-width')) {
+		styles.maxWidth = (element.getAttribute('maxWidth') || element.getAttribute('max-width')) as any;
+	}
+	if (element.hasAttribute('maxHeight') || element.hasAttribute('max-height')) {
+		styles.maxHeight = (element.getAttribute('maxHeight') || element.getAttribute('max-height')) as any;
 	}
 	
 	// Spacing
 	if (element.hasAttribute('margin')) {
 		styles.margin = Number(element.getAttribute('margin'));
 	}
-	if (element.hasAttribute('marginX')) {
-		styles.marginX = Number(element.getAttribute('marginX'));
+	if (element.hasAttribute('marginX') || element.hasAttribute('margin-x')) {
+		styles.marginX = Number(element.getAttribute('marginX') || element.getAttribute('margin-x'));
 	}
-	if (element.hasAttribute('marginY')) {
-		styles.marginY = Number(element.getAttribute('marginY'));
+	if (element.hasAttribute('marginY') || element.hasAttribute('margin-y')) {
+		styles.marginY = Number(element.getAttribute('marginY') || element.getAttribute('margin-y'));
 	}
-	if (element.hasAttribute('marginTop')) {
-		styles.marginTop = Number(element.getAttribute('marginTop'));
+	if (element.hasAttribute('marginTop') || element.hasAttribute('margin-top')) {
+		styles.marginTop = Number(element.getAttribute('marginTop') || element.getAttribute('margin-top'));
 	}
-	if (element.hasAttribute('marginBottom')) {
-		styles.marginBottom = Number(element.getAttribute('marginBottom'));
+	if (element.hasAttribute('marginBottom') || element.hasAttribute('margin-bottom')) {
+		styles.marginBottom = Number(element.getAttribute('marginBottom') || element.getAttribute('margin-bottom'));
 	}
-	if (element.hasAttribute('marginLeft')) {
-		styles.marginLeft = Number(element.getAttribute('marginLeft'));
+	if (element.hasAttribute('marginLeft') || element.hasAttribute('margin-left')) {
+		styles.marginLeft = Number(element.getAttribute('marginLeft') || element.getAttribute('margin-left'));
 	}
-	if (element.hasAttribute('marginRight')) {
-		styles.marginRight = Number(element.getAttribute('marginRight'));
+	if (element.hasAttribute('marginRight') || element.hasAttribute('margin-right')) {
+		styles.marginRight = Number(element.getAttribute('marginRight') || element.getAttribute('margin-right'));
 	}
 	
 	if (element.hasAttribute('padding')) {
 		styles.padding = Number(element.getAttribute('padding'));
 	}
-	if (element.hasAttribute('paddingX')) {
-		styles.paddingX = Number(element.getAttribute('paddingX'));
+	if (element.hasAttribute('paddingX') || element.hasAttribute('padding-x')) {
+		styles.paddingX = Number(element.getAttribute('paddingX') || element.getAttribute('padding-x'));
 	}
-	if (element.hasAttribute('paddingY')) {
-		styles.paddingY = Number(element.getAttribute('paddingY'));
+	if (element.hasAttribute('paddingY') || element.hasAttribute('padding-y')) {
+		styles.paddingY = Number(element.getAttribute('paddingY') || element.getAttribute('padding-y'));
 	}
-	if (element.hasAttribute('paddingTop')) {
-		styles.paddingTop = Number(element.getAttribute('paddingTop'));
+	if (element.hasAttribute('paddingTop') || element.hasAttribute('padding-top')) {
+		styles.paddingTop = Number(element.getAttribute('paddingTop') || element.getAttribute('padding-top'));
 	}
-	if (element.hasAttribute('paddingBottom')) {
-		styles.paddingBottom = Number(element.getAttribute('paddingBottom'));
+	if (element.hasAttribute('paddingBottom') || element.hasAttribute('padding-bottom')) {
+		styles.paddingBottom = Number(element.getAttribute('paddingBottom') || element.getAttribute('padding-bottom'));
 	}
-	if (element.hasAttribute('paddingLeft')) {
-		styles.paddingLeft = Number(element.getAttribute('paddingLeft'));
+	if (element.hasAttribute('paddingLeft') || element.hasAttribute('padding-left')) {
+		styles.paddingLeft = Number(element.getAttribute('paddingLeft') || element.getAttribute('padding-left'));
 	}
-	if (element.hasAttribute('paddingRight')) {
-		styles.paddingRight = Number(element.getAttribute('paddingRight'));
+	if (element.hasAttribute('paddingRight') || element.hasAttribute('padding-right')) {
+		styles.paddingRight = Number(element.getAttribute('paddingRight') || element.getAttribute('padding-right'));
 	}
 	
 	// Gap
 	if (element.hasAttribute('gap')) {
 		styles.gap = Number(element.getAttribute('gap'));
 	}
-	if (element.hasAttribute('columnGap')) {
-		styles.columnGap = Number(element.getAttribute('columnGap'));
+	if (element.hasAttribute('columnGap') || element.hasAttribute('column-gap')) {
+		styles.columnGap = Number(element.getAttribute('columnGap') || element.getAttribute('column-gap'));
 	}
-	if (element.hasAttribute('rowGap')) {
-		styles.rowGap = Number(element.getAttribute('rowGap'));
+	if (element.hasAttribute('rowGap') || element.hasAttribute('row-gap')) {
+		styles.rowGap = Number(element.getAttribute('rowGap') || element.getAttribute('row-gap'));
 	}
 	
 	// Position
@@ -126,20 +132,20 @@ function createYogaNode(element: ElementNode): YogaNode {
 	}
 	
 	// Border
-	if (element.hasAttribute('borderStyle')) {
-		styles.borderStyle = element.getAttribute('borderStyle') as any;
+	if (element.hasAttribute('borderStyle') || element.hasAttribute('border-style')) {
+		styles.borderStyle = (element.getAttribute('borderStyle') || element.getAttribute('border-style')) as any;
 	}
-	if (element.hasAttribute('borderTop')) {
-		styles.borderTop = element.getAttribute('borderTop') as boolean;
+	if (element.hasAttribute('borderTop') || element.hasAttribute('border-top')) {
+		styles.borderTop = (element.getAttribute('borderTop') || element.getAttribute('border-top')) as boolean;
 	}
-	if (element.hasAttribute('borderBottom')) {
-		styles.borderBottom = element.getAttribute('borderBottom') as boolean;
+	if (element.hasAttribute('borderBottom') || element.hasAttribute('border-bottom')) {
+		styles.borderBottom = (element.getAttribute('borderBottom') || element.getAttribute('border-bottom')) as boolean;
 	}
-	if (element.hasAttribute('borderLeft')) {
-		styles.borderLeft = element.getAttribute('borderLeft') as boolean;
+	if (element.hasAttribute('borderLeft') || element.hasAttribute('border-left')) {
+		styles.borderLeft = (element.getAttribute('borderLeft') || element.getAttribute('border-left')) as boolean;
 	}
-	if (element.hasAttribute('borderRight')) {
-		styles.borderRight = element.getAttribute('borderRight') as boolean;
+	if (element.hasAttribute('borderRight') || element.hasAttribute('border-right')) {
+		styles.borderRight = (element.getAttribute('borderRight') || element.getAttribute('border-right')) as boolean;
 	}
 	// Apply collected styles
 	if (Object.keys(styles).length > 0) {
