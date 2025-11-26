@@ -3,22 +3,44 @@ import { calculateLayout } from "../dom/layout.js";
 import Output from "./Output.js";
 import { renderNodeToOutput } from "./renderNodeToOutput.js";
 import { TerminalBoxElement } from "../dom/native-elements/TerminalBoxElement.js";
-import { elementIterator } from '../dom/nodes/DocumentNode';
 
 // Cache for static element output
 let staticOutputCache: string[] = [];
+// Track which static elements have been rendered
+let renderedStaticElements = new WeakSet<ElementNode>();
 
-
-function* staticElementIterator(el: any): Generator<ElementNode, void, undefined> {
-  if (el.getAttribute('internal_static')) {
-		yield el;
-    return;
-  }
-  for (const child of el.childNodes) {
-    yield* staticElementIterator(child);
-  }
+/**
+ * Check if an element or any of its ancestors is a static element
+ */
+function isInStaticElement(node: ElementNode): boolean {
+	let current: ElementNode | null = node;
+	while (current) {
+		if (current.getAttribute && current.getAttribute('internal_static')) {
+			return true;
+		}
+		current = current.parentNode as ElementNode | null;
+	}
+	return false;
 }
 
+/**
+ * Find all static elements in the tree
+ */
+function findStaticElements(node: ElementNode): TerminalBoxElement[] {
+	const staticElements: TerminalBoxElement[] = [];
+	
+	if (node.getAttribute && node.getAttribute('internal_static')) {
+		staticElements.push(node as TerminalBoxElement);
+	}
+	
+	for (const child of node.childNodes) {
+		if (child.nodeType === 1) {
+			staticElements.push(...findStaticElements(child as ElementNode));
+		}
+	}
+	
+	return staticElements;
+}
 
 /**
  * Extract lines from the document tree using layout-based rendering
@@ -38,62 +60,56 @@ export function extractLines(rootNode: ElementNode): {
 	const terminalWidth = process.stdout.columns || 80;
 	const terminalHeight = process.stdout.rows || 24;
 
+	// Find all static elements
+	const staticElements = findStaticElements(rootNode);
+	
+	// Check if we have any new static elements to render
+	const newStaticElements = staticElements.filter(el => !renderedStaticElements.has(el));
+	
 	// Calculate layout for the entire tree
-	calculateLayout(rootNode, terminalWidth, Math.max(0, terminalHeight - staticOutputCache.length));
+	const staticHeight = staticOutputCache.length;
+	calculateLayout(rootNode, terminalWidth, Math.max(0, terminalHeight - staticHeight));
 
-	// First, render static elements if they haven't been rendered yet
-	const staticElements: TerminalBoxElement[] = [];
-
-  for (const element of staticElementIterator(rootNode)) {
-    staticElements.push(element);
-  }
-
-	// If static elements have new children, render only the new ones and cache
-	if (staticElements.length) {
-
-		// Render only NEW children from static elements
-		for (const staticElement of staticElements) {
-			// Check if there are any new (not yet rendered) children
-			const newChildren = staticElement.childNodes.filter(c => !c.staticRendered);
+	// If we have new static elements, render them
+	if (newStaticElements.length > 0) {
+		for (const staticElement of newStaticElements) {
+			const height = staticElement.yogaNode?.getComputedHeight() || 0;
+			const width = staticElement.yogaNode?.getComputedWidth() || terminalWidth;
 			
-			if (newChildren.length === 0) {
-				continue;
-			}
+			const staticOutput = new Output({
+				width: width,
+				height: height,
+			});
 
-			// Render only the new children
-			for (const newChild of newChildren) {
-				const staticOutput = new Output({
-					width: newChild.yogaNode?.getComputedWidth() || staticElement.yogaNode!.getComputedWidth(),
-					height: newChild.yogaNode?.getComputedHeight() || staticElement.yogaNode!.getComputedHeight(),
-				});
+			// Render the static element
+			renderNodeToOutput(staticElement, staticOutput, {
+				offsetX: 0,
+				offsetY: 0,
+				transformers: [],
+				skipStaticElements: false,
+			});
 
-				renderNodeToOutput(newChild as ElementNode, staticOutput, {
-					offsetX: 0,
-					offsetY: 0,
-					transformers: [],
-					skipStaticElements: false,
-				});
-				
-				const { output: staticRendered } = staticOutput.get();
-				const newStaticLines = staticRendered.split('\n');
-
-				// Mark this child as rendered
-				newChild.staticRendered = true;
-
-				staticOutputCache.push(...newStaticLines);
-			}
+			const { output: renderedOutput } = staticOutput.get();
+			const lines = renderedOutput.split('\n');
+			
+			// Add to cache
+			staticOutputCache.push(...lines);
+			
+			// Mark as rendered
+			renderedStaticElements.add(staticElement);
 		}
 	}
 
+	// Calculate height for dynamic content
 	const height = rootNode.childNodes.map(c => c.yogaNode?.getComputedHeight() || 0).reduce((x, y) => x + y, 0);
-
-	// Create output buffer with calculated height
+	
+	// Create output buffer for dynamic content
 	const output = new Output({
 		width: rootNode.yogaNode?.getComputedWidth(),
 		height: height,
 	});
 
-	// Render the node tree to the output buffer, skipping static elements
+	// Render the node tree, skipping static elements
 	renderNodeToOutput(rootNode, output, {
 		offsetX: 0,
 		offsetY: 0,
@@ -103,8 +119,6 @@ export function extractLines(rootNode: ElementNode): {
 
 	// Extract the final output
 	const { output: renderedOutput } = output.get();
-
-	// Convert to lines
 	const dynamicLines = renderedOutput.split('\n');
 
 	return {
@@ -113,3 +127,10 @@ export function extractLines(rootNode: ElementNode): {
 	};
 }
 
+/**
+ * Reset the static cache (for testing)
+ */
+export function resetStaticCache() {
+	staticOutputCache = [];
+	renderedStaticElements = new WeakSet<ElementNode>();
+}

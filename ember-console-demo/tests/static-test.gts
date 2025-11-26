@@ -1,7 +1,7 @@
 import "./globalSetup";
 import { setupRenderingContext } from 'ember-vitest';
 import { describe, test, expect as hardExpect, beforeEach } from "vitest";
-import { Text, Box, Static, Spacer, render, FakeTTY } from "ember-console";
+import { Text, Box, Static, Spacer, render, FakeTTY, resetStaticCache } from "ember-console";
 import { rerender } from "@ember/test-helpers";
 import { trackedObject } from "@ember/reactive/collections";
 
@@ -17,6 +17,7 @@ describe("Static component integration test", () => {
 
   beforeEach(() => {
     fakeTTY = new FakeTTY();
+    resetStaticCache();
   });
 
   test("should render static tasks progressively without re-rendering old tasks", async () => {
