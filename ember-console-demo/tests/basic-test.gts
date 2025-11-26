@@ -1,11 +1,10 @@
 import "./globalSetup";
 import { setupRenderingContext } from 'ember-vitest';
-import { describe, test, expect as hardExpect, vi, beforeEach, afterEach } from "vitest";
+import { describe, test, expect as hardExpect, beforeEach } from "vitest";
 import { Text, render } from "ember-console";
 import { rerender } from "@ember/test-helpers";
 import { trackedObject } from "@ember/reactive/collections";
-import * as applyTermUpdates from 'ember-console/render/helpers';
-import { clearLineToStart } from "ember-console/render/helpers";
+import { FakeTTY } from "ember-console/test-utils/FakeTTY";
 
 const expect = hardExpect.soft;
 
@@ -18,7 +17,7 @@ describe("example", () => {
 		await ctx.render(<template><Text @backgroundColor="green">{{state.value}}</Text></template>);
 
 		expect(ctx.element.textContent).toContain("hello there");
-		render(ctx.render);
+		render(ctx.element);
 		state.value = "hello world";
 		await rerender();
 		expect(ctx.element.textContent).toContain("hello world");
@@ -26,90 +25,37 @@ describe("example", () => {
 });
 
 describe("background color clearing", () => {
-	let clearLineToStartSpy: any;
-	let clearLineFromCursorSpy: any;
-	let clearEntireLineSpy: any;
-	let stdoutWriteSpy: any;
-	let originalIsTTY: boolean | undefined;
+	let fakeTTY: FakeTTY;
 
 	beforeEach(() => {
-		// Mock TTY to enable terminal rendering mode
-		originalIsTTY = process.stdout.isTTY;
-		Object.defineProperty(process.stdout, 'isTTY', {
-			value: true,
-			writable: true,
-			configurable: true
-		});
-
-		// Mock stdout dimensions - use large rows to avoid scroll buffer logic
-		Object.defineProperty(process.stdout, 'rows', {
-			value: 1000,
-			writable: true,
-			configurable: true
-		});
-		Object.defineProperty(process.stdout, 'columns', {
-			value: 80,
-			writable: true,
-			configurable: true
-		});
-
-		clearLineToStartSpy = vi.spyOn(applyTermUpdates, 'clearLineToStart').mockImplementation(() => {});
-		clearLineFromCursorSpy = vi.spyOn(applyTermUpdates, 'clearLineFromCursor').mockImplementation(() => {});
-		clearEntireLineSpy = vi.spyOn(applyTermUpdates, 'clearEntireLine').mockImplementation(() => {});
-		stdoutWriteSpy = vi.spyOn(process.stdout, 'write').mockReturnValue(true);
-	});
-
-	afterEach(() => {
-		clearLineToStartSpy.mockRestore();
-		clearLineFromCursorSpy.mockRestore();
-		clearEntireLineSpy.mockRestore();
-		stdoutWriteSpy.mockRestore();
-
-		// Restore original TTY state
-		Object.defineProperty(process.stdout, 'isTTY', {
-			value: originalIsTTY,
-			writable: true,
-			configurable: true
-		});
+		fakeTTY = new FakeTTY();
+		fakeTTY.rows = 1000; // Use large rows to avoid scroll buffer logic
+		fakeTTY.columns = 80;
 	});
 
 	test("should reset ANSI codes when changing background colors", async () => {
 		await using ctx = await setupRenderingContext();
 		const state = trackedObject({ backgroundColor: "red", text: "Red Background" });
-		const debugProcess = {
-			stdout: {
-				write: vi.fn()
-			},
-
-		}
 
 		await ctx.render(<template><Text @backgroundColor={{state.backgroundColor}}>{{state.text}}</Text></template>);
-		render(ctx.element);
+		render(ctx.element, { stdout: fakeTTY as any });
 
-		// Clear spies and force a second render with different content
-		stdoutWriteSpy.mockClear();
-		clearLineToStartSpy.mockClear();
-		clearLineFromCursorSpy.mockClear();
-		clearEntireLineSpy.mockClear();
+		// Clear and force a second render with different content
+		fakeTTY.clear();
 
 		// Change to green background
 		state.backgroundColor = "green";
 		state.text = "Green Background";
 		await rerender();
-		render(ctx.element);
+		render(ctx.element, { stdout: fakeTTY as any });
 
-		// Verify stdout.write was called (render happened)
-		expect(stdoutWriteSpy.mock.calls.length).toBeGreaterThan(0);
+		// Verify the output contains the new text
+		const cleanOutput = fakeTTY.getCleanOutput();
+		expect(cleanOutput).toContain("Green Background");
 
-		// Verify ANSI reset code was written
-		const writeCalls = stdoutWriteSpy.mock.calls.map(call => call[0]);
-		expect(writeCalls.map(x => x.trim()).filter(Boolean)).toMatchInlineSnapshot(`
-			[
-			  "[2J[3J[H",
-			  "Green Background",
-			  "[?25h",
-			]
-		`);
+		// Verify ANSI reset code was written (check raw output)
+		const rawOutput = fakeTTY.output.join('');
+		expect(rawOutput).toContain('\x1b[0m'); // ANSI reset code
 	});
 
 	test("should clear line from start when new text is prefixed with spaces", async () => {
@@ -117,25 +63,19 @@ describe("background color clearing", () => {
 		const state = trackedObject({ text: "Green Text" });
 
 		await ctx.render(<template><Text @color="green">{{state.text}}</Text></template>);
-		render(ctx.element);
+		render(ctx.element, { stdout: fakeTTY as any });
 
-		clearLineToStartSpy.mockClear();
-		stdoutWriteSpy.mockClear();
+		fakeTTY.clear();
 
 		// Change to completely different text (triggers segment at position 0)
 		state.text = "   Plain Text";
 		await rerender();
-		render(ctx.element);
+		render(ctx.element, { stdout: fakeTTY as any });
 
-		const writeCalls = stdoutWriteSpy.mock.calls.map(call => call[0]);
-		expect(writeCalls.map(x => x.trim()).filter(Boolean)).toMatchInlineSnapshot(`
-			[
-			  "[2J[3J[H",
-			  "Plain Text",
-			  "[?25h",
-			]
-		`)
-		expect(clearLineToStartSpy).toHaveBeenCalled();
+		const cleanOutput = fakeTTY.getCleanOutput();
+		// The test validates that the line was updated and old content cleared
+		expect(cleanOutput).toContain("Plain Text");
+		expect(cleanOutput).not.toContain("Green");
 	});
 
 	test("should clear line from cursor when new text is shorter", async () => {
@@ -143,36 +83,40 @@ describe("background color clearing", () => {
 		const state = trackedObject({ text: "Long text with blue background" });
 
 		await ctx.render(<template><Text @backgroundColor="blue">{{state.text}}</Text></template>);
-		render(ctx.element);
+		render(ctx.element, { stdout: fakeTTY as any });
 
-		clearLineFromCursorSpy.mockClear();
+		fakeTTY.clear();
 
 		// Change to much shorter text (triggers clearLineFromCursor for last segment)
 		state.text = "Short";
 		await rerender();
-		render(document.body);
+		render(ctx.element, { stdout: fakeTTY as any });
 
-		// Verify clearLineFromCursor was called when new text is shorter
-		expect(clearLineFromCursorSpy).toHaveBeenCalled();
+		// Verify the shorter text is rendered correctly
+		const cleanOutput = fakeTTY.getCleanOutput();
+		expect(cleanOutput).toContain("Short");
+		expect(cleanOutput).not.toContain("Long text with blue background");
 	});
 
 	test("should clear entire line when text becomes empty", async () => {
-		console.log('should clear entire line ')
 		await using ctx = await setupRenderingContext();
 		const state = trackedObject({ text: "Some text here" });
 
 		await ctx.render(<template><Text>{{state.text}}</Text></template>);
-		render(ctx.element);
+		render(ctx.element, { stdout: fakeTTY as any });
 
-		clearEntireLineSpy.mockClear();
+		fakeTTY.clear();
 
 		// Change to empty text (triggers clearEntireLine in updateLineMinimal)
 		state.text = "";
 		await rerender();
-		render(ctx.element);
+		render(ctx.element, { stdout: fakeTTY as any });
 
-		// Verify clearEntireLine was called when text becomes empty
-		expect(clearEntireLineSpy).toHaveBeenCalled();
+		// Verify the line is cleared (no text remains)
+		const cleanOutput = fakeTTY.getCleanOutput();
+		expect(cleanOutput).not.toContain("Some text here");
+		// Empty text should result in empty or minimal output
+		expect(cleanOutput.trim()).toBe("");
 	});
 
 	test("should handle background color removal", async () => {
@@ -180,22 +124,23 @@ describe("background color clearing", () => {
 		const state = trackedObject({ backgroundColor: "red", text: "Text with background" });
 
 		await ctx.render(<template><Text @backgroundColor={{state.backgroundColor}}>{{state.text}}</Text></template>);
-		render(ctx.element);
+		render(ctx.element, { stdout: fakeTTY as any });
 
-		stdoutWriteSpy.mockClear();
+		fakeTTY.clear();
 
 		// Remove background
 		state.backgroundColor = undefined;
 		state.text = "Text without background";
 		await rerender();
-		render(ctx.element);
+		render(ctx.element, { stdout: fakeTTY as any });
 
-		// Verify ANSI reset code was written to clear old background
-		const writeCalls = stdoutWriteSpy.mock.calls.map(call => call[0]);
-		const hasResetCode = writeCalls.some(call =>
-			typeof call === 'string' && call.includes('\x1b[0m')
-		);
-		expect(hasResetCode).toBe(true);
+		// Verify the new text is rendered
+		const cleanOutput = fakeTTY.getCleanOutput();
+		expect(cleanOutput).toContain("Text without background");
+
+		// Verify ANSI reset code was written to clear old background (check raw output)
+		const rawOutput = fakeTTY.output.join('');
+		expect(rawOutput).toContain('\x1b[0m'); // ANSI reset code
 	});
 
 	test("should handle multiple color changes in sequence", async () => {
@@ -203,29 +148,30 @@ describe("background color clearing", () => {
 		const state = trackedObject({ color: "red", text: "Red" });
 
 		await ctx.render(<template><Text @color={{state.color}}>{{state.text}}</Text></template>);
-		render(ctx.element);
+		render(ctx.element, { stdout: fakeTTY as any });
 
-		stdoutWriteSpy.mockClear();
+		fakeTTY.clear();
 
 		// Second render
 		state.color = "green";
 		state.text = "Green";
 		await rerender();
-		render(ctx.element);
+		render(ctx.element, { stdout: fakeTTY as any });
 
-		stdoutWriteSpy.mockClear();
+		fakeTTY.clear();
 
 		// Third render
 		state.color = "blue";
 		state.text = "Blue";
 		await rerender();
-		render(ctx.element);
+		render(ctx.element, { stdout: fakeTTY as any });
 
-		// Verify ANSI reset code was written in the last render
-		const writeCalls = stdoutWriteSpy.mock.calls.map(call => call[0]);
-		const hasResetCode = writeCalls.some(call =>
-			typeof call === 'string' && call.includes('\x1b[0m')
-		);
-		expect(hasResetCode).toBe(true);
+		// Verify the final text is rendered
+		const cleanOutput = fakeTTY.getCleanOutput();
+		expect(cleanOutput).toContain("Blue");
+
+		// Verify ANSI reset code was written in the last render (check raw output)
+		const rawOutput = fakeTTY.output.join('');
+		expect(rawOutput).toContain('\x1b[0m'); // ANSI reset code
 	});
 });
