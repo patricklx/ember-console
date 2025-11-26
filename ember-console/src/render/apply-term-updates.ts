@@ -8,7 +8,7 @@ import { extractLines } from "./collect-lines.js";
 import * as readline from "node:readline";
 import { DocumentNode } from "../index.js";
 import * as Process from "node:process";
-import { clearEntireLine, clearLineFromCursor, clearLineToStart, moveCursorTo } from "./helpers";
+import { clearEntireLine, clearLineFromCursor, clearLineToStart, moveCursorTo, setProcess } from "./helpers";
 
 let process = globalThis.process;
 
@@ -509,7 +509,12 @@ function updateLineMinimal(line: number, oldText: string, newText: string): void
 
 	// If new line is empty, clear the entire line and return
 	if (newVisualLength === 0 && oldVisualLength > 0) {
-		readline.cursorTo(process.stdout, 0, line);
+		const stdout = process.stdout as any;
+		if (stdout.cursorTo) {
+			stdout.cursorTo(0, line);
+		} else {
+			readline.cursorTo(stdout, 0, line);
+		}
 		clearEntireLine();
 		return;
 	}
@@ -521,7 +526,12 @@ function updateLineMinimal(line: number, oldText: string, newText: string): void
 		const isLastSegment = i === segments.length - 1;
 
 		// Move cursor to the visual position of the changed segment
-		readline.cursorTo(process.stdout, segment.start, line);
+		const stdout = process.stdout as any;
+		if (stdout.cursorTo) {
+			stdout.cursorTo(segment.start, line);
+		} else {
+			readline.cursorTo(stdout, segment.start, line);
+		}
 
 		// Optimize clearing strategy based on segment position
 		const segmentVisualLength = getVisualLength(segment.text);
@@ -533,7 +543,11 @@ function updateLineMinimal(line: number, oldText: string, newText: string): void
 
 		// If first segment starts at position 0, clear from start to ensure no leftover content
 		if (isFirstSegment && segment.start > 0 && segment.text === '') {
-      readline.cursorTo(process.stdout, segment.start, line);
+			if (stdout.cursorTo) {
+				stdout.cursorTo(segment.start, line);
+			} else {
+				readline.cursorTo(stdout, segment.start, line);
+			}
 			clearLineToStart();
 		}
 
@@ -546,7 +560,11 @@ function updateLineMinimal(line: number, oldText: string, newText: string): void
 			process.stdout.write(segment.text);
 		}
 		if (needsClearRight) {
-			readline.cursorTo(process.stdout, newVisualLength, line);
+			if (stdout.cursorTo) {
+				stdout.cursorTo(newVisualLength, line);
+			} else {
+				readline.cursorTo(stdout, newVisualLength, line);
+			}
 			clearLineFromCursor();
 		}
 	}
@@ -558,8 +576,37 @@ function updateLineMinimal(line: number, oldText: string, newText: string): void
 /**
  * Render with line-by-line diffing using layout-based rendering
  */
-export function render(rootNode: ElementNode, debugProcess?: undefined | typeof Process): void {
-	process = debugProcess ?? process;
+export function render(rootNode: ElementNode, options?: RenderOptions | typeof Process): void {
+	// Support both old API (debugProcess) and new API (options)
+	if (options && 'stdout' in options) {
+		// New API with RenderOptions
+		const stdout = options.stdout || process.stdout;
+		const oldProcess = process;
+		process = {
+			...process,
+			stdout: stdout as any,
+			stdin: options.stdin || process.stdin,
+			stderr: options.stderr || process.stderr,
+		} as any;
+		
+		// Set process in helpers so they use the fake TTY
+		setProcess(process);
+		
+		try {
+			renderInternal(rootNode);
+		} finally {
+			process = oldProcess;
+			setProcess(oldProcess);
+		}
+	} else {
+		// Old API with debugProcess or no options
+		process = (options as typeof Process) ?? process;
+		setProcess(process);
+		renderInternal(rootNode);
+	}
+}
+
+function renderInternal(rootNode: ElementNode): void {
 	const result = extractLines(rootNode);
 	const oldLines = state.lines;
 
@@ -597,6 +644,22 @@ export function render(rootNode: ElementNode, debugProcess?: undefined | typeof 
 		}
 		return;
 	}
+	
+	// For first render or when old lines is empty, write all lines
+	if (oldLines.length === 0) {
+		try {
+			for (let i = 0; i < newLines.length; i++) {
+				if (i > 0) {
+					process.stdout.write('\n');
+				}
+				process.stdout.write(newLines[i]);
+			}
+			state.lines = newLines;
+		} finally {
+			process.stdout.write('\x1b[?25h'); // Show cursor
+		}
+		return;
+	}
 
 	// Hide cursor during rendering for smoother updates
 	process.stdout.write('\x1b[?25l');
@@ -607,16 +670,16 @@ export function render(rootNode: ElementNode, debugProcess?: undefined | typeof 
 		const visibleStartLine = scrollBufferSize;
 		const maxLines = Math.max(newLines.length, oldLines.length);
 
-		for (let i = 0; i < maxLines; i++) {
+		for (let i = visibleStartLine; i < maxLines; i++) {
 			const newLine = newLines[i];
 			const oldLine = oldLines[i];
 
 			if (newLine !== oldLine) {
 				// Calculate screen position (relative to visible viewport)
-				const screenLine = i - visibleStartLine;
+				const screenLine = i - scrollBufferSize;
 
 				// Only update lines within visible terminal viewport
-				if (screenLine >= 0 && screenLine < state.terminalHeight) {
+				if (i >= visibleStartLine && i < state.terminalHeight + scrollBufferSize) {
 					if (newLine === undefined) {
 						// Line was removed - clear it
 						moveCursorTo(screenLine);
@@ -629,10 +692,10 @@ export function render(rootNode: ElementNode, debugProcess?: undefined | typeof 
 						// Line changed - apply minimal update
 						updateLineMinimal(screenLine, oldLine, newLine);
 					}
-				} else if (i >= oldLines.length) {
+				} else if (i > state.terminalHeight + scrollBufferSize) {
 					// Beyond previous content - just write newline and content
-					process.stdout.write('\n');
 					if (newLine !== undefined) {
+            process.stdout.write('\n');
 						process.stdout.write(newLine);
 					}
 				}

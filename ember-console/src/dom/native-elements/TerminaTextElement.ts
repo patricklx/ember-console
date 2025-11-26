@@ -99,12 +99,12 @@ export class TerminaTextElement extends ElementNode<Attributes> {
       }
     }
 
-    let t = parts.filter(Boolean).join('');
+    let t = parts.join(' ');
     this.text = this.transform(t);
   }
 
   transform(children: string): string {
-    const dimColor = this.getAttribute('dim-color');
+    const dimColor = this.getAttribute('dim') || this.getAttribute('dim-color');
     const color = this.getAttribute('color');
     const backgroundColor = this.getAttribute('background-color');
     const bold = this.getAttribute('bold');

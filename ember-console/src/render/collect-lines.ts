@@ -53,32 +53,35 @@ export function extractLines(rootNode: ElementNode): {
 
 		// Render only NEW children from static elements
 		for (const staticElement of staticElements) {
-			const staticOutput = new Output({
-				width: staticElement.yogaNode!.getComputedWidth(),
-				height: staticElement.yogaNode!.getComputedHeight(),
-			});
-
-			if (!staticElement.firstElement() || staticElement.childNodes.every(c => c.staticRendered)) {
+			// Check if there are any new (not yet rendered) children
+			const newChildren = staticElement.childNodes.filter(c => !c.staticRendered);
+			
+			if (newChildren.length === 0) {
 				continue;
 			}
 
-			renderNodeToOutput(staticElement, staticOutput, {
-				offsetX: 0,
-				offsetY: 0,
-				transformers: [],
-				skipStaticElements: false,
-			});
-			const { output: staticRendered } = staticOutput.get();
-			const newStaticLines = staticRendered.split('\n');
+			// Render only the new children
+			for (const newChild of newChildren) {
+				const staticOutput = new Output({
+					width: newChild.yogaNode?.getComputedWidth() || staticElement.yogaNode!.getComputedWidth(),
+					height: newChild.yogaNode?.getComputedHeight() || staticElement.yogaNode!.getComputedHeight(),
+				});
 
-			for (const el of staticElement.childNodes) {
-				el.staticRendered = true;
-				if (el.yogaNode) {
-					staticElement.yogaNode?.removeChild(el.yogaNode);
-				}
+				renderNodeToOutput(newChild as ElementNode, staticOutput, {
+					offsetX: 0,
+					offsetY: 0,
+					transformers: [],
+					skipStaticElements: false,
+				});
+				
+				const { output: staticRendered } = staticOutput.get();
+				const newStaticLines = staticRendered.split('\n');
+
+				// Mark this child as rendered
+				newChild.staticRendered = true;
+
+				staticOutputCache.push(...newStaticLines);
 			}
-
-			staticOutputCache.push(...newStaticLines);
 		}
 	}
 

@@ -1,29 +1,59 @@
 import * as readline from "node:readline";
 
+let process = globalThis.process;
+
+/**
+ * Set the process object to use for output
+ * This allows tests to inject a fake TTY
+ */
+export function setProcess(proc: typeof globalThis.process): void {
+	process = proc;
+}
+
 /**
  * Move cursor to specific line (0-based)
  */
 export function moveCursorTo(line: number): void {
-	readline.cursorTo(process.stdout, 0, line);
+	const stdout = process.stdout as any;
+	if (stdout.cursorTo) {
+		stdout.cursorTo(0, line);
+	} else {
+		readline.cursorTo(stdout, 0, line);
+	}
 }
 
 /**
  * Clear from cursor to end of line
  */
 export function clearLineFromCursor(): void {
-	readline.clearLine(process.stdout, 1); // Clear from cursor to end
+	const stdout = process.stdout as any;
+	if (stdout.clearLine) {
+		stdout.clearLine(1);
+	} else {
+		readline.clearLine(stdout, 1); // Clear from cursor to end
+	}
 }
 
 /**
  * Clear from cursor to start of line
  */
 export function clearLineToStart(): void {
-	readline.clearLine(process.stdout, -1); // Clear from cursor to start
+	const stdout = process.stdout as any;
+	if (stdout.clearLine) {
+		stdout.clearLine(-1);
+	} else {
+		readline.clearLine(stdout, -1); // Clear from cursor to start
+	}
 }
 
 /**
  * Clear entire line
  */
 export function clearEntireLine(): void {
-	readline.clearLine(process.stdout, 0); // Clear entire line
+	const stdout = process.stdout as any;
+	if (stdout.clearLine) {
+		stdout.clearLine(0);
+	} else {
+		readline.clearLine(stdout, 0); // Clear entire line
+	}
 }
