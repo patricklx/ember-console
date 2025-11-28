@@ -10,7 +10,7 @@ export class FakeTTY {
   private cursorX: number = 0;
   private cursorY: number = 0;
   private lastClearIndex: number = 0;
-  
+
   // Terminal buffer: array of lines, each line is array of {char, ansi}
   private buffer: Array<Array<{char: string, ansi: string}>> = [];
   private currentAnsiState: string = '';
@@ -28,7 +28,7 @@ export class FakeTTY {
 
   write(data: string): boolean {
     this.output.push(data);
-    
+
     // Parse and apply the data to buffer
     let i = 0;
     while (i < data.length) {
@@ -42,7 +42,7 @@ export class FakeTTY {
           continue;
         }
       }
-      
+
       // Handle newline
       if (data[i] === '\n') {
         this.cursorY++;
@@ -54,19 +54,19 @@ export class FakeTTY {
         i++;
         continue;
       }
-      
+
       // Handle carriage return
       if (data[i] === '\r') {
         this.cursorX = 0;
         i++;
         continue;
       }
-      
+
       // Regular character - write to buffer
       this.writeCharToBuffer(data[i]);
       i++;
     }
-    
+
     return true;
   }
 
@@ -90,7 +90,7 @@ export class FakeTTY {
       // Show cursor - ignore
       return;
     }
-    
+
     // Cursor positioning: ESC[row;colH or ESC[row;colf
     const posMatch = code.match(/\x1b\[(\d+);(\d+)[Hf]/);
     if (posMatch) {
@@ -98,39 +98,39 @@ export class FakeTTY {
       this.cursorX = parseInt(posMatch[2]) - 1;
       return;
     }
-    
+
     // Cursor to column: ESC[colG
     const colMatch = code.match(/\x1b\[(\d+)G/);
     if (colMatch) {
       this.cursorX = parseInt(colMatch[1]) - 1;
       return;
     }
-    
+
     // Cursor movement
     const upMatch = code.match(/\x1b\[(\d+)A/);
     if (upMatch) {
       this.cursorY -= parseInt(upMatch[1]);
       return;
     }
-    
+
     const downMatch = code.match(/\x1b\[(\d+)B/);
     if (downMatch) {
       this.cursorY += parseInt(downMatch[1]);
       return;
     }
-    
+
     const rightMatch = code.match(/\x1b\[(\d+)C/);
     if (rightMatch) {
       this.cursorX += parseInt(rightMatch[1]);
       return;
     }
-    
+
     const leftMatch = code.match(/\x1b\[(\d+)D/);
     if (leftMatch) {
       this.cursorX -= parseInt(leftMatch[1]);
       return;
     }
-    
+
     // Clear line: ESC[0K (to end), ESC[1K (to start), ESC[2K (entire)
     if (code === '\x1b[0K') {
       this.clearLineFromCursorToEnd();
@@ -144,7 +144,7 @@ export class FakeTTY {
       this.clearEntireLineInBuffer();
       return;
     }
-    
+
     // Clear screen: ESC[2J, ESC[3J, ESC[0J
     if (code === '\x1b[2J' || code === '\x1b[3J') {
       this.initBuffer();
@@ -160,7 +160,7 @@ export class FakeTTY {
       }
       return;
     }
-    
+
     // Color codes - track current state
     if (code.match(/\x1b\[\d+(;\d+)*m/)) {
       if (code === '\x1b[0m') {
@@ -177,15 +177,15 @@ export class FakeTTY {
     while (this.buffer.length <= this.cursorY) {
       this.buffer.push([]);
     }
-    
+
     // Ensure current line has enough columns
     const line = this.buffer[this.cursorY];
     while (line.length <= this.cursorX) {
       line.push({char: ' ', ansi: ''});
     }
-    
+
     // Write character with current ANSI state
-    line[this.cursorX] = {char, ansi: this.currentAnsiState};
+      line[this.cursorX] = {char, ansi: this.currentAnsiState};
     this.cursorX++;
   }
 
@@ -232,19 +232,19 @@ export class FakeTTY {
   moveCursor(dx: number, dy: number, callback?: () => void): boolean {
     this.cursorX += dx;
     this.cursorY += dy;
-    
+
     if (dy < 0) {
       this.output.push(`\x1b[${Math.abs(dy)}A`);
     } else if (dy > 0) {
       this.output.push(`\x1b[${dy}B`);
     }
-    
+
     if (dx > 0) {
       this.output.push(`\x1b[${dx}C`);
     } else if (dx < 0) {
       this.output.push(`\x1b[${Math.abs(dx)}D`);
     }
-    
+
     if (callback) callback();
     return true;
   }
@@ -285,19 +285,19 @@ export class FakeTTY {
    */
   private getBufferOutput(): string {
     const lines: string[] = [];
-    
+
     for (let y = 0; y < this.buffer.length; y++) {
       const line = this.buffer[y];
-      
+
       // Always add a line, even if empty, to preserve line indexing
       if (line.length === 0) {
         lines.push('');
         continue;
       }
-      
+
       let lineStr = '';
       let lastAnsi = '';
-      
+
       for (let x = 0; x < line.length; x++) {
         const cell = line[x];
         // Add ANSI code if it changed
@@ -310,20 +310,20 @@ export class FakeTTY {
         }
         lineStr += cell.char;
       }
-      
+
       // Reset at end of line if we had any ANSI
       if (lastAnsi) {
         lineStr += '\x1b[0m';
       }
-      
+
       lines.push(lineStr);
     }
-    
+
     // Trim trailing empty lines (but keep internal empty lines for proper indexing)
     while (lines.length > 0 && lines[lines.length - 1] === '') {
       lines.pop();
     }
-    
+
     return lines.join('\n');
   }
 

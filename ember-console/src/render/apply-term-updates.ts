@@ -41,8 +41,8 @@ interface RenderState {
 
 const state: RenderState = {
 	lines: [],
-	terminalHeight: process.stdout.rows || 24,
-	terminalWidth: process.stdout.columns || 80,
+	terminalHeight: process.stdout.rows || 0,
+	terminalWidth: process.stdout.columns || 0,
 	scrollOffset: 0
 };
 
@@ -610,7 +610,7 @@ export function render(rootNode: ElementNode, options?: RenderOptions | typeof P
 }
 
 function renderInternal(rootNode: ElementNode): void {
-	const result = extractLines(rootNode);
+	const result = extractLines(rootNode, state);
 	const oldLines = state.lines;
 
 	// Calculate scroll buffer offset (lines that have scrolled off screen)
@@ -620,7 +620,7 @@ function renderInternal(rootNode: ElementNode): void {
 	// Check if we need a full redraw:
 	// Only check lines in the scroll buffer (before the visible viewport)
 	// If any line in scroll buffer changed, we need full redraw
-	const needsFullRedraw = scrollBufferSize > 0 &&
+	const needsFullRedraw = oldLines.length === 0 || scrollBufferSize > 0 &&
 		(() => {
 			// Check only lines in the scroll buffer (0 to scrollBufferSize)
 			for (let i = 0; i < scrollBufferSize; i++) {
@@ -634,6 +634,7 @@ function renderInternal(rootNode: ElementNode): void {
 	// If scroll buffer changed, clear everything and redraw
 	if (needsFullRedraw) {
 		clearScreen();
+		state.lines = [];
 		try {
 			for (let i = 0; i < newLines.length; i++) {
 				if (i > 0) {
@@ -667,11 +668,11 @@ function renderInternal(rootNode: ElementNode): void {
 
 				// Only update lines within visible terminal viewport
 				if (i >= visibleStartLine && i < state.terminalHeight + scrollBufferSize) {
-					if (newLine === undefined) {
+					if (newLine === undefined || newLine === "") {
 						// Line was removed - clear it
 						moveCursorTo(screenLine);
 						clearEntireLine();
-					} else if (oldLine === undefined) {
+					} else if (oldLine === undefined || oldLine === "") {
 						// New line - just write it
 						moveCursorTo(screenLine);
 						process.stdout.write(newLine);
@@ -679,22 +680,14 @@ function renderInternal(rootNode: ElementNode): void {
 						// Line changed - apply minimal update
 						updateLineMinimal(screenLine, oldLine, newLine);
 					}
-				} else if (i > state.terminalHeight + scrollBufferSize) {
+				} else if (screenLine >= state.terminalHeight) {
 					// Beyond previous content - just write newline and content
+					moveCursorTo(screenLine);
+					process.stdout.write('\n');
 					if (newLine !== undefined) {
-            process.stdout.write('\n');
 						process.stdout.write(newLine);
 					}
 				}
-			}
-		}
-
-		// Clear any extra lines from previous render (only within terminal bounds)
-		if (oldLines.length > newLines.length) {
-			const linesToClear = Math.min(oldLines.length, state.terminalHeight);
-			for (let i = newLines.length; i < linesToClear; i++) {
-				moveCursorTo(i);
-				clearEntireLine();
 			}
 		}
 
@@ -727,13 +720,9 @@ export function clearScreen(): void {
  * Handle terminal resize
  */
 export function handleResize(document: DocumentNode): void {
-	const newHeight = process.stdout.rows || 24;
-	const newWidth = process.stdout.columns || 80;
-	// Check if dimensions actually changed
-	if (newHeight !== state.terminalHeight || newWidth !== state.terminalWidth) {
-		// Clear and force full re-render on resize
-		clearScreen();
-		// The next render cycle will redraw everything
-		render(document.body)
-	}
+	const newHeight = process.stdout.rows;
+	const newWidth = process.stdout.columns;
+	state.terminalHeight = newHeight;
+	state.terminalWidth = newWidth;
+	clearScreen();
 }

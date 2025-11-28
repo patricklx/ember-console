@@ -1,5 +1,5 @@
 import Component from '@glimmer/component';
-import { Text, Box } from 'ember-console';
+import { Text, Box, Spacer, Static } from 'ember-console';
 import { tracked } from "@glimmer/tracking";
 import { service } from '@ember/service';
 import type RouterService from '@ember/routing/router-service';

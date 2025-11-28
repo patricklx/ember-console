@@ -55,8 +55,6 @@ export default class StaticTest extends Component {
 			</Static>
 		</Box>
 
-    <Spacer />
-
     <Box flexDirection="column">
       {{! Dynamic section - updates continuously }}
       <Box marginTop={{1}}>

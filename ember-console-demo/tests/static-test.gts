@@ -47,7 +47,6 @@ describe("Static component integration test", () => {
 
     // Initial render with no tasks
     render(ctx.element, { stdout: fakeTTY as any });
-    fakeTTY.clear();
 
     // Add first task
     state.tasks = [...state.tasks, { id: 0, title: 'Task #1' }];
@@ -55,6 +54,17 @@ describe("Static component integration test", () => {
     render(ctx.element, { stdout: fakeTTY as any });
 
     let output = fakeTTY.getCleanOutput();
+    console.log('=== First render output ===');
+    console.log(output);
+    console.log('=== Buffer state ===');
+    console.log('Buffer length:', fakeTTY.buffer.length);
+    for (let i = 0; i < fakeTTY.buffer.length; i++) {
+      const lineContent = fakeTTY.buffer[i].map(c => c.char).join('');
+      if (lineContent.trim() || i < 5) {
+        console.log(`Line ${i}: "${lineContent}"`);
+      }
+    }
+    console.log('=== End output ===');
     expect(output).toContain('Task #1');
     expect(output).toContain('Completed tasks: 1');
 

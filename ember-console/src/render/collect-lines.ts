@@ -34,13 +34,14 @@ function* staticElementIterator(el: any): Generator<ElementNode, void, undefined
  * 4. Extracts the final output and converts to lines
  * 5. Handles static elements separately - they are cached and not re-rendered
  */
-export function extractLines(rootNode: ElementNode): {
+export function extractLines(rootNode: ElementNode, {
+	terminalHeight,
+	terminalWidth,
+	scrollOffset,
+}): {
 	static: string[],
 	dynamic: string[],
 } {
-	// Get terminal dimensions
-	const terminalWidth = process.stdout.columns || 80;
-	const terminalHeight = process.stdout.rows || 24;
 
 	// Calculate layout for the entire tree
 	calculateLayout(rootNode, terminalWidth, Math.max(0, terminalHeight - staticOutputCache.length));
@@ -52,13 +53,15 @@ export function extractLines(rootNode: ElementNode): {
     staticElements.push(element);
   }
 
+	let hadNewStaticElements = false;
+
 	// If static elements have new children, render only the new ones and cache
 	if (staticElements.length) {
 
 		// Render only NEW children from static elements
 		for (const staticElement of staticElements) {
 			const staticOutput = new Output({
-				width: staticElement.yogaNode!.getComputedWidth(),
+				width: process.stdout.rows,
 				height: staticElement.yogaNode!.getComputedHeight(),
 			});
 
@@ -77,6 +80,7 @@ export function extractLines(rootNode: ElementNode): {
 
 			for (const el of staticElement.childNodes) {
 				el.staticRendered = true;
+				hadNewStaticElements = true;
 				if (el.yogaNode) {
 					staticElement.yogaNode?.removeChild(el.yogaNode);
 				}
@@ -85,6 +89,8 @@ export function extractLines(rootNode: ElementNode): {
 				staticOutputCache.push(...newStaticLines);
 			}
 		}
+
+	calculateLayout(rootNode, terminalWidth, Math.max(0, terminalHeight - staticOutputCache.length));
 
 	const height = rootNode.childNodes.map(c => c.yogaNode?.getComputedHeight() || 0).reduce((x, y) => x + y, 0);
 
