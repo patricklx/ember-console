@@ -4,7 +4,6 @@
  */
 
 import TerminalDocumentNode from './dom/nodes/DocumentNode.js';
-import TerminalElementNode from './dom/nodes/TerminalElementNode.js';
 import ViewNode from "./dom/nodes/ViewNode";
 import { SimpleDynamicAttribute } from '@glimmer/runtime';
 import { registerElements } from "./dom/setup-registry";

@@ -3,6 +3,7 @@ import ViewNode from './ViewNode.ts';
 import {type Node as YogaNode} from 'yoga-layout';
 import { createYogaNode, updateYogaNodeStyles } from '../layout.ts';
 import type {Styles} from '../styles.ts';
+import { OutputTransformer } from "./TerminalElementNode";
 
 
 export interface IClassList {
@@ -19,12 +20,17 @@ export default class ElementNode<Attributes = any> extends ViewNode<Attributes> 
   declare _classList: IClassList;
   declare _id: string;
   yogaNode?: YogaNode;
+	internal_transform?: OutputTransformer;
 	staticRendered?: YogaNode;
 
   /**
    * Override setAttribute to update Yoga styles when style attributes change
    */
   setAttribute(key: string, value: any): void {
+		if (key === 'internal_transform') {
+			this.internal_transform = value;
+			return;
+		}
     super.setAttribute(key, value);
   }
 

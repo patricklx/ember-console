@@ -115,6 +115,28 @@ export async function load(url, context, nextLoad) {
 		};
 	}
 
+  // Handle tinygradient CommonJS module
+  if (url.includes('tinygradient') && url.includes('node_modules')) {
+    try {
+      const filePath = fileURLToPath(url);
+      const content = readFileSync(filePath, 'utf8');
+      // Wrap CommonJS in ESM wrapper
+      const wrappedSource = `
+        import { createRequire } from 'module';
+        const require = createRequire(import.meta.url);
+        const mod = require('${filePath}');
+        export default mod;
+      `;
+      return {
+        format: 'module',
+        source: wrappedSource,
+        shortCircuit: true,
+      };
+    } catch (e) {
+      console.error('Error wrapping tinygradient:', e);
+    }
+  }
+
   let filePath = url;
   try {
     filePath = fileURLToPath(url);

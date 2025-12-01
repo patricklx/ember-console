@@ -506,37 +506,7 @@ function getTrailingAnsi(tokens: Token[]): string {
  * Tabs move to the next multiple of tabWidth (default 8)
  */
 function expandTabs(text: string, startColumn: number = 0, tabWidth: number = 8): string {
-	let result = '';
-	let column = startColumn;
-
-	for (let i = 0; i < text.length; i++) {
-		const char = text[i];
-		if (char === '\t') {
-			// Calculate spaces needed to reach next tab stop
-			const spacesToAdd = tabWidth - (column % tabWidth);
-			result += ' '.repeat(spacesToAdd);
-			column += spacesToAdd;
-		} else if (char === '\x1b') {
-			// Handle ANSI escape sequences - don't affect column position
-			let j = i;
-			if (text[i + 1] === '[') {
-				j = i + 2;
-				while (j < text.length && !/[a-zA-Z]/.test(text[j])) {
-					j++;
-				}
-				if (j < text.length) {
-					j++; // Include the final letter
-				}
-			}
-			result += text.slice(i, j);
-			i = j - 1; // -1 because loop will increment
-		} else {
-			result += char;
-			column++;
-		}
-	}
-
-	return result;
+	return text.replace(/\t/g, ' '.repeat(tabWidth));
 }
 
 /**

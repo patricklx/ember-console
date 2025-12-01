@@ -4,6 +4,7 @@ import { tracked } from "@glimmer/tracking";
 import { service } from '@ember/service';
 import type RouterService from '@ember/routing/router-service';
 import { hideCursor } from "ember-console/render/apply-term-updates";
+import Gradient from "../components/Gradient.gts";
 
 
 const eq = (a, b) => a === b;
@@ -31,8 +32,7 @@ export default class AppTemplate extends Component {
 		hideCursor();
 
 		// Start at menu
-		this.selectedView = 'file-editor';
-    this.router.transitionTo('file-editor');
+		this.selectedView = 'menu';
 	}
 
 	willDestroy() {
@@ -86,10 +86,9 @@ export default class AppTemplate extends Component {
 	}
 
 	<template>
-		{{(this.startCounter)}}
-    <Box @flexDirection="column"  @height='100%'>
+    <Box @flexDirection="column"  @height='100%' @alignItems={{if (eq this.selectedView 'file-editor') '' 'center'}}>
       {{#if (eq this.selectedView "menu")}}
-        <Text @bold={{true}} @color="cyan">Ember Console Demo - Main Menu</Text>
+        <Gradient @name="rainbow" >Ember Console Demo - Main Menu</Gradient>
         <Text>---</Text>
         <Text @color="white">[1] Colors Demo</Text>
         <Text @color="white">[2] Lorem Ipsum Generator</Text>

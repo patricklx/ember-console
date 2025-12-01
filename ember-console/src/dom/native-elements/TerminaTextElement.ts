@@ -3,6 +3,7 @@ import chalk, { ForegroundColorName } from 'chalk';
 import { Styles } from '../styles';
 import colorize from '../colorize';
 import { LiteralUnion } from "type-fest";
+import { elementIterator } from "../nodes/DocumentNode";
 
 
 interface Attributes {
@@ -81,29 +82,29 @@ export class TerminaTextElement extends ElementNode<Attributes> {
     let parts: string[] = [];
     const preFormatted = this.getAttribute('pre-formatted');
 
-    for (const child of this.childNodes) {
-      if (child instanceof TerminaTextElement) {
-        // If child is pre-formatted, preserve its text as-is
-        const childPreFormatted = child.getAttribute('pre-formatted');
-        if (childPreFormatted) {
-          parts.push(child.text);
-        } else {
-          parts.push((child as any).text || '');
-        }
-      } else if ((child as any).text) {
+		for (const child of elementIterator(this)) {
+			if (child === this) continue;
+			if (child instanceof TerminaTextElement) {
+				// If child is pre-formatted, preserve its text as-is
+				const childPreFormatted = child.getAttribute('pre-formatted');
+				if (childPreFormatted) {
+					parts.push(child.text);
+				} else {
+					parts.push((child as any).text || '');
+				}
+			} else if ((child as any).text) {
 				let t = (child as any).text;
 				if (!preFormatted) {
 					t = t.split('\n').map((line) => line.trim()).filter(Boolean).join(' ');
 				}
-        parts.push(t);
-      }
-    }
-
+				parts.push(t);
+			}
+		}
     let t = parts.join(' ');
     this.text = this.transform(t);
   }
 
-  transform(children: string): string {
+  transform(text: string): string {
     const dimColor = this.getAttribute('dim') || this.getAttribute('dim-color');
     const color = this.getAttribute('color');
     const backgroundColor = this.getAttribute('background-color');
@@ -114,40 +115,40 @@ export class TerminaTextElement extends ElementNode<Attributes> {
     const inverse = this.getAttribute('inverse');
     const inheritedBackgroundColor = this.getAttribute('inheritedBackgroundColor');
     if (dimColor) {
-      children = chalk.dim(children);
+      text = chalk.dim(text);
     }
 
     if (color) {
-      children = colorize(children, color, 'foreground');
+      text = colorize(text, color, 'foreground');
     }
 
     // Use explicit backgroundColor if provided, otherwise use inherited from parent Box
     const effectiveBackgroundColor =
       backgroundColor ?? inheritedBackgroundColor;
     if (effectiveBackgroundColor) {
-      children = colorize(children, effectiveBackgroundColor, 'background');
+      text = colorize(text, effectiveBackgroundColor, 'background');
     }
 
     if (bold) {
-      children = chalk.bold(children);
+      text = chalk.bold(text);
     }
 
     if (italic) {
-      children = chalk.italic(children);
+      text = chalk.italic(text);
     }
 
     if (underline) {
-      children = chalk.underline(children);
+      text = chalk.underline(text);
     }
 
     if (strikethrough) {
-      children = chalk.strikethrough(children);
+      text = chalk.strikethrough(text);
     }
 
     if (inverse) {
-      children = chalk.inverse(children);
+      text = chalk.inverse(text);
     }
 
-    return children;
+    return text;
   };
 }

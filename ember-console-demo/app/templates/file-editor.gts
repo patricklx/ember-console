@@ -51,13 +51,7 @@ export default class FileEditorTemplate extends Component {
           return false;
         }
       }).sort();
-      this.selectedIndex = 0;
-      this.loadFile(this.files[0]);
-      setTimeout(() => {
-        for (let i = 0; i < 20; i++) {
-          this.handleEditMode('\u001b[B');
-        }
-      }, 1000)
+      this.selectedIndex = 0;7
     } catch (error) {
       this.statusMessage = `Error loading files: ${error.message}`;
     }

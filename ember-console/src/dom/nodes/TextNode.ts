@@ -25,11 +25,18 @@ export default class TextNode extends ViewNode {
     return this._parentNode;
   }
 
-  setText(text: string) {
-    this.text = text;
+	updateParentNode() {
 		if (this._parentNode instanceof TerminaTextElement) {
 			this._parentNode.updateText();
 		}
+		if (this._parentNode instanceof TextNode) {
+			this._parentNode.updateParentNode();
+		}
+	}
+
+  setText(text: string) {
+    this.text = text;
+		this.updateParentNode();
   }
 
 	get nodeValue() {
