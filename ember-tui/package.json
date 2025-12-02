@@ -26,7 +26,7 @@
     "lint:fix": "concurrently 'pnpm:lint:*:fix' --names 'fix:'",
     "lint:js": "eslint .",
     "lint:js:fix": "eslint . --fix",
-    "lint:types": "ember-tsc --noEmit",
+    "lint:types": "ember-tsc --noEmit --project tsconfig.json",
     "prepack": "pnpm build",
     "dev": "rollup --config --watch",
     "clean": "rm -rf dist",

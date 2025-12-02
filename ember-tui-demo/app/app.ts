@@ -2,7 +2,6 @@ import EmberApplication from '@ember/application';
 // @ts-expect-error - ember-resolver types not properly exported
 import Resolver from 'ember-resolver/index.js';
 import ENV from './config/env';
-// @ts-expect-error - @embroider/virtual has no type declarations
 import compatModules from '@embroider/virtual/compat-modules';
 import ApplicationInstance from "@ember/application/instance";
 

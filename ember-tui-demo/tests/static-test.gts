@@ -30,27 +30,20 @@ describe("Static component integration test", () => {
     const state = trackedObject({ tasks: [] as Task[], counter: 0 });
 
     await ctx.render(<template>
-		{{! @glint-expect-error: ElementNode vs Element type mismatch }}
 		<Box @height="100%" @overflow="visible" @flexDirection="column" >
-			{{! @glint-expect-error: ElementNode vs Element type mismatch }}
-			<Text @bold={{true}} @color="cyan">Select a view (press 1, 2, 3, 4, or 5): {{this.selectedView}}</Text>
+			<Text @bold={{true}} @color="cyan">Tasks Demo</Text>
 			<Text @color="green">[1] Colors Demo</Text>
-			{{! @glint-expect-error: ElementNode vs Element type mismatch }}
-			<Box flexDirection="column">
+			<Box @flexDirection="column">
 				<Static @items={{state.tasks}}>
 					<:default as |task|>
-						{{! @glint-expect-error: ElementNode vs Element type mismatch }}
-						<Text color="green">✔ {{task.title}}</Text>
+						<Text @color="green">✔ {{task.title}}</Text>
 					</:default>
 				</Static>
 			</Box>
 			<Spacer />
-			{{! @glint-expect-error: ElementNode vs Element type mismatch }}
-			<Box flexDirection="column">
-				{{! @glint-expect-error: ElementNode vs Element type mismatch }}
-				<Box marginTop={{1}}>
-					{{! @glint-expect-error: ElementNode vs Element type mismatch }}
-					<Text dimColor={{true}}>Completed tasks: {{state.tasks.length}} | Counter: {{state.counter}}</Text>
+			<Box @flexDirection="column">
+				<Box @marginTop={{1}}>
+					<Text @dimColor={{true}}>Completed tasks: {{state.tasks.length}} | Counter: {{state.counter}}</Text>
 				</Box>
 			</Box>
 		</Box>
@@ -120,17 +113,17 @@ describe("Static component integration test", () => {
     });
 
     await ctx.render(<template>
-      <Box flexDirection="column">
+      <Box @flexDirection="column">
         <Static @items={{state.tasks}}>
           <:default as |task|>
-            <Text color="green">✔ {{task.title}}</Text>
+            <Text @color="green">✔ {{task.title}}</Text>
           </:default>
         </Static>
       </Box>
       <Spacer />
-      <Box flexDirection="column">
-        <Box marginTop={{1}}>
-          <Text dimColor={{true}}>Completed tasks: {{state.tasks.length}} | Counter: {{state.counter}}</Text>
+      <Box @flexDirection="column">
+        <Box @marginTop={{1}}>
+          <Text @dimColor={{true}}>Completed tasks: {{state.tasks.length}} | Counter: {{state.counter}}</Text>
         </Box>
       </Box>
     </template>);
@@ -167,17 +160,17 @@ describe("Static component integration test", () => {
     const state = trackedObject({ tasks: [] as Task[], counter: 0 });
 
     await ctx.render(<template>
-      <Box flexDirection="column">
+      <Box @flexDirection="column">
         <Static @items={{state.tasks}}>
           <:default as |task|>
-            <Text color="green">✔ {{task.title}}</Text>
+            <Text @color="green">✔ {{task.title}}</Text>
           </:default>
         </Static>
       </Box>
       <Spacer />
-      <Box flexDirection="column">
-        <Box marginTop={{1}}>
-          <Text dimColor={{true}}>Completed tasks: {{state.tasks.length}} | Counter: {{state.counter}}</Text>
+      <Box @flexDirection="column">
+        <Box @marginTop={{1}}>
+          <Text @dimColor={{true}}>Completed tasks: {{state.tasks.length}} | Counter: {{state.counter}}</Text>
         </Box>
       </Box>
     </template>);
@@ -224,17 +217,17 @@ describe("Static component integration test", () => {
     });
 
     await ctx.render(<template>
-      <Box flexDirection="column">
+      <Box @flexDirection="column">
         <Static @items={{state.tasks}}>
           <:default as |task|>
-            <Text color="green">✔ {{task.title}}</Text>
+            <Text @color="green">✔ {{task.title}}</Text>
           </:default>
         </Static>
       </Box>
       <Spacer />
-      <Box flexDirection="column">
-        <Box marginTop={{1}}>
-          <Text dimColor={{true}}>Completed tasks: {{state.tasks.length}} | Counter: {{state.counter}}</Text>
+      <Box @flexDirection="column">
+        <Box @marginTop={{1}}>
+          <Text @dimColor={{true}}>Completed tasks: {{state.tasks.length}} | Counter: {{state.counter}}</Text>
         </Box>
       </Box>
     </template>);
@@ -255,17 +248,17 @@ describe("Static component integration test", () => {
     });
 
     await ctx.render(<template>
-      <Box flexDirection="column">
+      <Box @flexDirection="column">
         <Static @items={{state.tasks}}>
           <:default as |task|>
-            <Text color="green">✔ {{task.title}}</Text>
+            <Text @color="green">✔ {{task.title}}</Text>
           </:default>
         </Static>
       </Box>
       <Spacer />
-      <Box flexDirection="column">
-        <Box marginTop={{1}}>
-          <Text dimColor={{true}}>Completed tasks: {{state.tasks.length}} | Counter: {{state.counter}}</Text>
+      <Box @flexDirection="column">
+        <Box @marginTop={{1}}>
+          <Text @dimColor={{true}}>Completed tasks: {{state.tasks.length}} | Counter: {{state.counter}}</Text>
         </Box>
       </Box>
     </template>);

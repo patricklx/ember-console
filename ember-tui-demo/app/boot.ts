@@ -10,12 +10,8 @@ function init(
 
 	env.rootElement = DocumentNode.getInstance().body;
 
-	// @ts-expect-error - name property not in Application type but accepted at runtime
-	const app = Application.create({
-		name: env.modulePrefix,
-		version: env.APP.version,
-		ENV: env
-	});
+	const app = Application.create() as any;
+	app.ENV = env;
 
 	app.register('config:environment', env);
 
@@ -45,9 +41,8 @@ export async function startApp() {
 
 	const app = init(App, env)
   // Visit the static-test route to test Static component
-  // @ts-expect-error - Document type mismatch between DOM and custom DocumentNode
   await app.visit('/static-test', {
-    document: document,
+    document: document as any,
     isInteractive: true,
   });
 
@@ -56,5 +51,5 @@ export async function startApp() {
   // Make app available globally for debugging
   (globalThis as any).app = app;
 
-	startRender(document);
+	startRender(document as any as DocumentNode);
 }

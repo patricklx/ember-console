@@ -10,12 +10,12 @@ import { SimpleDynamicAttribute } from '@glimmer/runtime';
 import { registerElements } from "./dom/setup-registry";
 
 
-SimpleDynamicAttribute.prototype.set = function (dom, value) {
+SimpleDynamicAttribute.prototype.set = function (dom: any, value: any) {
 	const { name, namespace } = this.attribute;
 	dom.__setAttribute(name, value as any, namespace);
 };
 
-SimpleDynamicAttribute.prototype.update = function (value) {
+SimpleDynamicAttribute.prototype.update = function (value: any) {
 	const normalizedValue = value;
 	const { element: element, name: name } = this.attribute;
 	if (null === normalizedValue) {
