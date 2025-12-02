@@ -1,6 +1,4 @@
 import Component from '@glimmer/component';
-import { tracked } from '@glimmer/tracking';
-import chalk from 'chalk';
 import type ElementNode from '../dom/nodes/ElementNode';
 
 interface TextSignature {
