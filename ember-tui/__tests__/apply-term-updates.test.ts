@@ -1,11 +1,11 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render } from '../render/apply-term-updates';
-import ElementNode from '../dom/nodes/ElementNode';
-import { extractLines } from '../render/collect-lines';
-import { FakeTTY } from '../test-utils/FakeTTY';
+import { render } from '../src/render/apply-term-updates';
+import ElementNode from '../src/dom/nodes/ElementNode';
+import { extractLines } from '../src/render/collect-lines';
+import { FakeTTY } from '../src/test-utils/FakeTTY';
 
 // Mock extractLines to return controlled output
-vi.mock('../render/collect-lines', () => ({
+vi.mock('../src/render/collect-lines', () => ({
   extractLines: vi.fn()
 }));
 

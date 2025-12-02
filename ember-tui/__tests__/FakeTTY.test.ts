@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { FakeTTY } from '../test-utils/FakeTTY';
+import { FakeTTY } from '../src/test-utils/FakeTTY';
 
 describe('FakeTTY', () => {
   let tty: FakeTTY;
@@ -294,10 +294,10 @@ describe('FakeTTY', () => {
       const beforeClear = tty.output.length;
       tty.clear();
       tty.write('World');
-      
+
       // Output array should still grow
       expect(tty.output.length).toBeGreaterThan(beforeClear);
-      
+
       // But visible output should only show what's after clear
       const visibleOutput = tty.getVisibleOutput();
       expect(visibleOutput).toContain('World');
@@ -307,7 +307,7 @@ describe('FakeTTY', () => {
       tty.write('Hello World\nLine 2');
       tty.cursorTo(10, 5);
       tty.reset();
-      
+
       expect(tty.output).toEqual([]);
       expect(tty.rows).toBe(24);
       expect(tty.columns).toBe(80);
@@ -322,10 +322,10 @@ describe('FakeTTY', () => {
       for (let i = 1; i <= 30; i++) {
         tty.write(`Line ${i}\n`);
       }
-      
+
       const lines = tty.getLines();
       expect(lines.length).toBe(30);
-      
+
       // All lines should be preserved in buffer
       expect(lines[0]).toBe('Line 1');
       expect(lines[29]).toBe('Line 30');
@@ -336,11 +336,11 @@ describe('FakeTTY', () => {
       for (let i = 1; i <= 25; i++) {
         tty.write(`Line ${i}\n`);
       }
-      
+
       // Move cursor back up and overwrite
       tty.write('\x1b[10A'); // Move up 10 lines
       tty.write('OVERWRITTEN');
-      
+
       const lines = tty.getLines();
       // Line at position (25 - 10) should contain OVERWRITTEN
       expect(lines[15]).toContain('OVERWRITTEN');
@@ -351,7 +351,7 @@ describe('FakeTTY', () => {
       for (let i = 1; i <= 100; i++) {
         tty.write(`Line ${i}\n`);
       }
-      
+
       const lines = tty.getLines();
       expect(lines.length).toBe(100);
       expect(lines[99]).toBe('Line 100');
@@ -361,7 +361,7 @@ describe('FakeTTY', () => {
       // Position cursor at line 50 (beyond default 24 rows)
       tty.write('\x1b[50;1H');
       tty.write('Deep Line');
-      
+
       const output = tty.getCleanOutput();
       const lines = output.split('\n');
       expect(lines[49]).toContain('Deep Line');
@@ -372,10 +372,10 @@ describe('FakeTTY', () => {
       for (let i = 1; i <= 30; i++) {
         tty.write(`Line ${i}\n`);
       }
-      
+
       // Clear screen
       tty.write('\x1b[2J');
-      
+
       // Buffer should be cleared
       const output = tty.getCleanOutput();
       expect(output).toBe('');
@@ -386,14 +386,14 @@ describe('FakeTTY', () => {
       for (let i = 1; i <= 30; i++) {
         tty.write(`Line ${i}\n`);
       }
-      
+
       // Move to middle of buffer
       tty.write('\x1b[15;1H');
       tty.write('INSERTED');
-      
+
       // Clear from cursor down
       tty.write('\x1b[0J');
-      
+
       const lines = tty.getLines();
       // Should have lines 1-14 and the inserted line
       expect(lines.length).toBeLessThan(30);
@@ -408,10 +408,10 @@ describe('FakeTTY', () => {
         logLines.push(line);
         tty.write(line + '\n');
       }
-      
+
       const lines = tty.getLines();
       expect(lines.length).toBe(50);
-      
+
       // Verify first and last entries
       expect(lines[0]).toContain('Log entry 1');
       expect(lines[49]).toContain('Log entry 50');
@@ -423,11 +423,11 @@ describe('FakeTTY', () => {
         const color = i % 2 === 0 ? '31' : '32'; // Alternate red/green
         tty.write(`\x1b[${color}mLine ${i}\x1b[0m\n`);
       }
-      
+
       const fullOutput = tty.getFullOutput();
       expect(fullOutput).toContain('\x1b[31m');
       expect(fullOutput).toContain('\x1b[32m');
-      
+
       const lines = tty.getLines();
       expect(lines.length).toBe(30);
     });
@@ -437,11 +437,11 @@ describe('FakeTTY', () => {
       for (let i = 1; i <= 40; i++) {
         tty.write(`Line ${i}\n`);
       }
-      
+
       // Move to line 20 (0-indexed as 19) and clear down
       tty.cursorTo(0, 19);
       tty.clearScreenDown();
-      
+
       const lines = tty.getLines();
       // Should have lines 1-19, line 20 is cleared (cursor is at line 19, clears from cursor down)
       expect(lines.length).toBeLessThanOrEqual(20);

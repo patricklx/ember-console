@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { tokenize, getActiveAnsiCodes, findDiffSegments } from '../render/apply-term-updates';
-import * as applyTermUpdates from '../render/apply-term-updates';
+import { tokenize, getActiveAnsiCodes, findDiffSegments } from '../src/render/apply-term-updates';
+import * as applyTermUpdates from '../src/render/apply-term-updates';
 
 
 describe('tokenize', () => {
