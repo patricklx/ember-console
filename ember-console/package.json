@@ -4,6 +4,9 @@
   "description": "Terminal UI library for Ember.js - inspired by Ink",
   "type": "module",
   "main": "./dist/index.js",
+  "files": [
+    "dist"
+  ],
   "exports": {
     ".": {
       "production": {
@@ -39,7 +42,7 @@
     "type-fest": "^5.2.0",
     "widest-line": "^5.0.0",
     "yoga-layout": "~3.2.1",
-	  "indent-string": "^5.0.0"
+    "indent-string": "^5.0.0"
   },
   "devDependencies": {
     "@babel/plugin-proposal-class-properties": "^7.18.6",

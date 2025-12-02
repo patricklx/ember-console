@@ -38,12 +38,7 @@ export default {
     preserveModulesRoot: 'src',
     sourcemap: true,
   },
-  external: [
-    '@glimmer/component',
-    '@glimmer/tracking',
-    'chalk',
-    'yoga-layout',
-  ],
+  external: [/node_modules/],
   plugins: [
 		json(),
 		gtsPreprocessor(),
