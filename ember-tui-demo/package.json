@@ -13,7 +13,7 @@
         "lint:js": "eslint .",
         "lint:js:fix": "eslint . --fix",
         "lint:types": "ember-tsc --noEmit",
-		"test": "vitest --run --printConsoleTrace --disable-console-intercept --silent=false",
+		"test": "FORCE_COLOR=2 vitest --run ./tests",
 		"test:update": "vitest --run --update"
 	},
 	"exports": {

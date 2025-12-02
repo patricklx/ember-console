@@ -27,8 +27,6 @@ export default class FileEditorTemplate extends Component {
 	// @ts-expect-error - decorator syntax issue in .gts files
   @tracked statusMessage = '';
 
-  maxVisibleLines = (process.stdout.rows || 22) - 3 - 7;
-
   constructor(owner: unknown, args: object) {
 		// @ts-expect-error - Owner type mismatch
     super(owner, args);
