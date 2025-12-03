@@ -2,6 +2,7 @@ import path from 'path';
 import fs from 'fs';
 import { babel } from '@rollup/plugin-babel';
 import copy from 'rollup-plugin-copy';
+import { nodeResolve } from '@rollup/plugin-node-resolve';
 import { Addon } from '@embroider/addon-dev/rollup';
 
 
@@ -30,6 +31,12 @@ export default {
   treeshake: true,
 
   plugins: [
+    // Resolve TypeScript imports without extensions
+    nodeResolve({
+      extensions: ['.ts', '.js', '.gts', '.gjs'],
+      preferBuiltins: true,
+    }),
+
     // These are the modules that users should be able to import from your
     // addon. Anything not listed here may get optimized away.
     // By default all your JavaScript modules (**/*.js) will be importable.

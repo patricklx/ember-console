@@ -3,7 +3,7 @@
  * Similar to ember-native's setup but for terminal rendering
  */
 
-import TerminalDocumentNode from './dom/nodes/DocumentNode.js';
+import TerminalDocumentNode from './dom/nodes/DocumentNode';
 import ViewNode from "./dom/nodes/ViewNode";
 // @ts-expect-error - @glimmer/runtime has no type declarations
 import { SimpleDynamicAttribute } from '@glimmer/runtime';

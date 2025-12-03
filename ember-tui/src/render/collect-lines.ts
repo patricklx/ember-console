@@ -1,8 +1,8 @@
 import ElementNode from "../dom/nodes/ElementNode";
-import { calculateLayout } from "../dom/layout.js";
-import Output from "./Output.js";
-import { renderNodeToOutput } from "./renderNodeToOutput.js";
-import { TerminalBoxElement } from "../dom/native-elements/TerminalBoxElement.js";
+import { calculateLayout } from "../dom/layout";
+import Output from "./Output";
+import { renderNodeToOutput } from "./renderNodeToOutput";
+import { TerminalBoxElement } from "../dom/native-elements/TerminalBoxElement";
 
 // Cache for static element output
 let staticOutputCache: string[] = [];

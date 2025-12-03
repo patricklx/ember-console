@@ -1,4 +1,4 @@
-import ElementNode from './ElementNode.ts';
+import ElementNode from './ElementNode';
 
 export default class CommentNode extends ElementNode {
   nodeType: any;

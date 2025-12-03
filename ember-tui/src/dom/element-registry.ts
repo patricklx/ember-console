@@ -1,4 +1,4 @@
-import type { NativeElementsTagNameMap } from './native-elements-tag-name-map.ts';
+import type { NativeElementsTagNameMap } from './native-elements-tag-name-map';
 import ElementNode from "./nodes/ElementNode";
 
 const elementMap: Record<string, any> = {};

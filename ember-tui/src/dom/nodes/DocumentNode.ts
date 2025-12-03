@@ -1,9 +1,9 @@
-import CommentNode from './CommentNode.ts';
-import ElementNode from './ElementNode.ts';
-import TextNode from './TextNode.ts';
-import ViewNode, { EventListener } from './ViewNode.ts';
+import CommentNode from './CommentNode';
+import ElementNode from './ElementNode';
+import TextNode from './TextNode';
+import ViewNode, { EventListener } from './ViewNode';
 import { createElement } from "../element-registry";
-import { elementIterator } from './element-iterator.ts';
+import { elementIterator } from './element-iterator';
 
 // Type alias for elements with nativeView property
 type NativeElementNode = ViewNode & { nativeView: any };

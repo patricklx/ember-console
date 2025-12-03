@@ -4,11 +4,12 @@
     "module": "ES2022",
     "lib": ["ES2023"],
     "moduleResolution": "bundler",
+    "emitDeclarationOnly": true,
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
-    "outDir": "./dist",
-    "rootDir": ".",
+    "outDir": "./declarations",
+    "rootDir": "./src",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
@@ -19,6 +20,6 @@
     "emitDecoratorMetadata": true,
     "types": ["node"]
   },
-  "include": ["src/**/*", "__mocks__", "__tests__"],
+  "include": ["src/**/*"],
   "exclude": ["node_modules", "dist", "vitest.config.ts"]
 }

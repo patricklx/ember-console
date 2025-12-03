@@ -1,4 +1,4 @@
-import DocumentNode from './DocumentNode.ts';
+import DocumentNode from './DocumentNode';
 import { getViewMeta } from "../element-registry";
 import {type Node as YogaNode} from 'yoga-layout';
 
@@ -23,7 +23,7 @@ export default class ViewNode<Attributes = any> {
   childNodes: ViewNode[];
   _ownerDocument: any;
   _meta: any;
-  
+
   // Properties used by layout and rendering
   yogaNode?: YogaNode;
   staticRendered?: boolean;

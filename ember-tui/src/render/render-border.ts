@@ -1,8 +1,8 @@
 import cliBoxes from 'cli-boxes';
 import chalk from 'chalk';
-import colorize from '../dom/colorize.js';
-import ElementNode from '../dom/nodes/ElementNode.js';
-import type Output from './Output.js';
+import colorize from '../dom/colorize';
+import ElementNode from '../dom/nodes/ElementNode';
+import type Output from './Output';
 
 /**
  * Render border around a box element

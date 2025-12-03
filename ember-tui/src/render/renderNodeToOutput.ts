@@ -1,13 +1,13 @@
 import Yoga from 'yoga-layout';
 import widestLine from 'widest-line';
 import indentString from 'indent-string';
-import ElementNode from '../dom/nodes/ElementNode.js';
-import { TerminaTextElement } from '../dom/native-elements/TerminaTextElement.js';
-import { TerminalBoxElement } from '../dom/native-elements/TerminalBoxElement.js';
-import type Output from './Output.js';
-import type { OutputTransformer } from './Output.js';
-import renderBorder from './render-border.js';
-import renderBackground from './render-background.js';
+import ElementNode from '../dom/nodes/ElementNode';
+import { TerminaTextElement } from '../dom/native-elements/TerminaTextElement';
+import { TerminalBoxElement } from '../dom/native-elements/TerminalBoxElement';
+import type Output from './Output';
+import type { OutputTransformer } from './Output';
+import renderBorder from './render-border';
+import renderBackground from './render-background';
 
 /**
  * Get maximum width for text wrapping

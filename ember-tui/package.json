@@ -5,8 +5,20 @@
   "type": "module",
   "main": "./dist/index.js",
   "files": [
-    "dist"
+    "dist",
+    "declarations"
   ],
+  "publishConfig": {
+	"exports": {
+	  ".": {
+		"require": "./dist/index.cjs.js",
+		"import": "./dist/index.esm.js"
+	  },
+	  "./*": {
+		"default": "./dist/*.ts"
+	  }
+	}
+  },
   "exports": {
     ".": {
       "production": {
@@ -21,7 +33,7 @@
   },
   "scripts": {
     "build": "rollup --config",
-    "build:types": "ember-tsc --declaration && npx fix-bad-declaration-output './declarations/**/*.d.ts'",
+    "build:types": "ember-tsc --project tsconfig.build.json --declaration && npx fix-bad-declaration-output './declarations/**/*.d.ts'",
     "lint": "concurrently 'pnpm:lint:*(!fix)' --names 'lint:'",
     "lint:fix": "concurrently 'pnpm:lint:*:fix' --names 'fix:'",
     "lint:js": "eslint .",
@@ -93,6 +105,14 @@
   },
   "ember-addon": {
     "version": 2,
-    "type": "addon"
+    "type": "addon",
+    "app-js": {
+      "./components/ember-native/Box.js": "./dist/_app_/components/ember-native/Box.js",
+      "./components/ember-native/Newline.js": "./dist/_app_/components/ember-native/Newline.js",
+      "./components/ember-native/Spacer.js": "./dist/_app_/components/ember-native/Spacer.js",
+      "./components/ember-native/Static.js": "./dist/_app_/components/ember-native/Static.js",
+      "./components/ember-native/Text.js": "./dist/_app_/components/ember-native/Text.js",
+      "./components/ember-native/Transform.js": "./dist/_app_/components/ember-native/Transform.js"
+    }
   }
 }

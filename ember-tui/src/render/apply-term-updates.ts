@@ -4,9 +4,9 @@
  */
 
 import ElementNode from "../dom/nodes/ElementNode";
-import { extractLines } from "./collect-lines.js";
+import { extractLines } from "./collect-lines";
 import * as readline from "node:readline";
-import { DocumentNode } from "../index.js";
+import { DocumentNode } from "../index";
 import * as Process from "node:process";
 import { clearEntireLine, clearLineFromCursor, clearLineToStart, moveCursorTo, setProcess } from "./helpers";
 import * as fs from 'node:fs';

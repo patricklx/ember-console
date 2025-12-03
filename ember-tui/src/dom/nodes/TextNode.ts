@@ -1,4 +1,4 @@
-import ViewNode from './ViewNode.ts';
+import ViewNode from './ViewNode';
 import { TerminaTextElement } from "../native-elements/TerminaTextElement";
 
 export default class TextNode extends ViewNode {

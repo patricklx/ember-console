@@ -4,7 +4,7 @@
  */
 
 // Export setup and render
-export { setup } from './setup.js';
+export { setup } from './setup';
 export { startRender } from './startRender';
 export { render } from './render/apply-term-updates';
 
@@ -18,4 +18,4 @@ export { default as Static } from './components/Static.gts';
 
 // Test utilities
 export { FakeTTY } from './test-utils/FakeTTY';
-export { resetStaticCache } from './render/collect-lines.js';
+export { resetStaticCache } from './render/collect-lines';

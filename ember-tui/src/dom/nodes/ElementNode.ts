@@ -1,4 +1,4 @@
-import ViewNode from './ViewNode.ts';
+import ViewNode from './ViewNode';
 import {type Node as YogaNode} from 'yoga-layout';
 import { OutputTransformer } from "./TerminalElementNode";
 
