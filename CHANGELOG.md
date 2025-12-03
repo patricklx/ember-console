@@ -2,6 +2,22 @@
 
 ## Release (2025-12-03)
 
+* ember-tui 0.2.2 (patch)
+
+#### :bug: Bug Fix
+* `ember-tui`
+  * [#9](https://github.com/patricklx/ember-tui/pull/9) add peer dep ([@patricklx](https://github.com/patricklx))
+  * [#8](https://github.com/patricklx/ember-tui/pull/8) fix bad exports definition ([@patricklx](https://github.com/patricklx))
+
+#### :memo: Documentation
+* [#10](https://github.com/patricklx/ember-tui/pull/10) fix: 404 on demo links in readme ([@johanrd](https://github.com/johanrd))
+
+#### Committers: 2
+- Patrick Pircher ([@patricklx](https://github.com/patricklx))
+- [@johanrd](https://github.com/johanrd)
+
+## Release (2025-12-03)
+
 * ember-tui 0.2.1 (patch)
 
 #### :bug: Bug Fix
