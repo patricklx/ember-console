@@ -34,6 +34,9 @@ jobs:
       - name: Lint ember-tui
         run: pnpm --filter ember-tui lint
 
+      - name: Build ember-tui
+        run: pnpm --filter ember-tui build
+
       - name: Lint ember-tui-demo
         run: pnpm --filter ember-tui-demo lint
 
@@ -42,9 +45,6 @@ jobs:
 
       - name: Test ember-tui-demo
         run: pnpm --filter ember-tui-demo test
-
-      - name: Build ember-tui
-        run: pnpm --filter ember-tui build
 
       - name: Build ember-tui-demo
         run: pnpm --filter ember-tui-demo build
