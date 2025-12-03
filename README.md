@@ -1,5 +1,9 @@
 # Ember TUI
 
+<p align="center">
+  <img src="logo.svg" alt="Ember TUI Logo" width="200" height="200">
+</p>
+
 > Ember.js for CLIs. Build and test your CLI output using components.
 
 Ember TUI provides the same component-based UI building experience that Ember.js offers in the browser, but for command-line apps.
