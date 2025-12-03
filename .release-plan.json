@@ -1,19 +1,19 @@
 {
   "solution": {
     "ember-tui": {
-      "impact": "minor",
-      "oldVersion": "0.1.0",
-      "newVersion": "0.2.0",
+      "impact": "patch",
+      "oldVersion": "0.2.0",
+      "newVersion": "0.2.1",
       "tagName": "latest",
       "constraints": [
         {
-          "impact": "minor",
-          "reason": "Appears in changelog section :rocket: Enhancement"
+          "impact": "patch",
+          "reason": "Appears in changelog section :bug: Bug Fix"
         }
       ],
       "pkgJSONPath": "./ember-tui/package.json"
-    }
+    },
+    "undefined": {}
   },
-  "description": "## Release (2025-12-03)\n\n* ember-tui 0.2.0 (minor)\n\n#### :rocket: Enhancement\n* `ember-tui`\n  * [#2](https://github.com/patricklx/ember-tui/pull/2) first release ([@patricklx](https://github.com/patricklx))\n\n#### Committers: 1\n- Patrick Pircher ([@patricklx](https://github.com/patricklx))\n"
+  "description": "## Release (2025-12-03)\n\n* ember-tui 0.2.1 (patch)\n\n#### :bug: Bug Fix\n* `ember-tui`\n  * [#6](https://github.com/patricklx/ember-tui/pull/6) fix issue with new lines, need to normalize ([@patricklx](https://github.com/patricklx))\n  * [#5](https://github.com/patricklx/ember-tui/pull/5) fix type exports ([@patricklx](https://github.com/patricklx))\n\n#### Committers: 1\n- Patrick Pircher ([@patricklx](https://github.com/patricklx))\n"
 }
-
