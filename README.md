@@ -18,7 +18,7 @@ npm install ember-tui
 
 ## Usage
 
-```gts
+```glimmer-ts
 import { render, Text } from 'ember-tui';
 import { tracked } from '@glimmer/tracking';
 
@@ -68,7 +68,7 @@ Note that all text must be wrapped in a [`<Text>`](#text) component.
 
 This component can display text and change its style to make it bold, underlined, italic, or strikethrough.
 
-```gts
+```glimmer-ts
 import { render, Text } from 'ember-tui';
 
 const template = <template>
@@ -94,7 +94,7 @@ Type: `string`
 Change text color.
 Ember TUI uses [chalk](https://github.com/chalk/chalk) under the hood, so all its functionality is supported.
 
-```gts
+```glimmer-ts
 <Text @color="green">Green</Text>
 <Text @color="#005cc5">Blue</Text>
 <Text @color="rgb(232, 131, 136)">Red</Text>
@@ -106,7 +106,7 @@ Type: `string`
 
 Same as `color` above, but for background.
 
-```gts
+```glimmer-ts
 <Text @backgroundColor="green" @color="white">Green</Text>
 <Text @backgroundColor="#005cc5" @color="white">Blue</Text>
 <Text @backgroundColor="rgb(232, 131, 136)" @color="white">Red</Text>
@@ -119,7 +119,7 @@ Default: `false`
 
 Dim the color (make it less bright).
 
-```gts
+```glimmer-ts
 <Text @color="red" @dimColor={{true}}>Dimmed Red</Text>
 ```
 
@@ -158,7 +158,7 @@ Default: `false`
 
 Invert background and foreground colors.
 
-```gts
+```glimmer-ts
 <Text @inverse={{true}} @color="yellow">Inversed Yellow</Text>
 ```
 
@@ -172,7 +172,7 @@ This property tells Ember TUI to wrap or truncate text if its width is larger th
 If `wrap` is passed (the default), Ember TUI will wrap text and split it into multiple lines.
 If `truncate-*` is passed, Ember TUI will truncate text instead, resulting in one line of text with the rest cut off.
 
-```gts
+```glimmer-ts
 <Box @width={{7}}>
   <Text>Hello World</Text>
 </Box>
@@ -200,7 +200,7 @@ If `truncate-*` is passed, Ember TUI will truncate text instead, resulting in on
 `<Box>` is an essential Ember TUI component to build your layout.
 It's like `<div style="display: flex">` in the browser.
 
-```gts
+```glimmer-ts
 import { render, Box, Text } from 'ember-tui';
 
 const template = <template>
@@ -221,14 +221,14 @@ Type: `number` `string`
 Width of the element in spaces.
 You can also set it as a percentage, which will calculate the width based on the width of the parent element.
 
-```gts
+```glimmer-ts
 <Box @width={{4}}>
   <Text>X</Text>
 </Box>
 //=> 'X   '
 ```
 
-```gts
+```glimmer-ts
 <Box @width={{10}}>
   <Box @width="50%">
     <Text>X</Text>
@@ -245,7 +245,7 @@ Type: `number` `string`
 Height of the element in lines (rows).
 You can also set it as a percentage, which will calculate the height based on the height of the parent element.
 
-```gts
+```glimmer-ts
 <Box @height={{4}}>
   <Text>X</Text>
 </Box>
@@ -315,7 +315,7 @@ Default: `0`
 
 Padding on all sides. Equivalent to setting `paddingTop`, `paddingBottom`, `paddingLeft` and `paddingRight`.
 
-```gts
+```glimmer-ts
 <Box @paddingTop={{2}}><Text>Top</Text></Box>
 <Box paddingBottom={{2}}><Text>Bottom</Text></Box>
 <Box @paddingLeft={{2}}><Text>Left</Text></Box>
@@ -376,7 +376,7 @@ Default: `0`
 
 Margin on all sides. Equivalent to setting `marginTop`, `marginBottom`, `marginLeft` and `marginRight`.
 
-```gts
+```glimmer-ts
 <Box @marginTop={{2}}><Text>Top</Text></Box>
 <Box marginBottom={{2}}><Text>Bottom</Text></Box>
 <Box marginLeft={{2}}><Text>Left</Text></Box>
@@ -395,7 +395,7 @@ Default: `0`
 
 Size of the gap between an element's columns and rows. A shorthand for `columnGap` and `rowGap`.
 
-```gts
+```glimmer-ts
 <Box @gap={{1}} @width={{3}} @flexWrap="wrap">
   <Text>A</Text>
   <Text>B</Text>
@@ -413,7 +413,7 @@ Default: `0`
 
 Size of the gap between an element's columns.
 
-```gts
+```glimmer-ts
 <Box @columnGap={{1}}>
   <Text>A</Text>
   <Text>B</Text>
@@ -428,7 +428,7 @@ Default: `0`
 
 Size of the gap between an element's rows.
 
-```gts
+```glimmer-ts
 <Box @flexDirection="column" @rowGap={{1}}>
   <Text>A</Text>
   <Text>B</Text>
@@ -447,7 +447,7 @@ Default: `0`
 
 See [flex-grow](https://css-tricks.com/almanac/properties/f/flex-grow/).
 
-```gts
+```glimmer-ts
 <Box>
   <Text>Label:</Text>
   <Box @flexGrow={{1}}>
@@ -463,7 +463,7 @@ Default: `1`
 
 See [flex-shrink](https://css-tricks.com/almanac/properties/f/flex-shrink/).
 
-```gts
+```glimmer-ts
 <Box @width={{20}}>
   <Box @flexShrink={{2}} @width={{10}}>
     <Text>Will be 1/4</Text>
@@ -480,7 +480,7 @@ Type: `number` `string`
 
 See [flex-basis](https://css-tricks.com/almanac/properties/f/flex-basis/).
 
-```gts
+```glimmer-ts
 <Box @width={{6}}>
   <Box @flexBasis={{3}}>
     <Text>X</Text>
@@ -497,7 +497,7 @@ Allowed values: `row` `row-reverse` `column` `column-reverse`
 
 See [flex-direction](https://css-tricks.com/almanac/properties/f/flex-direction/).
 
-```gts
+```glimmer-ts
 <Box>
   <Box @marginRight={{1}}>
     <Text>X</Text>
@@ -529,7 +529,7 @@ Allowed values: `nowrap` `wrap` `wrap-reverse`
 
 See [flex-wrap](https://css-tricks.com/almanac/properties/f/flex-wrap/).
 
-```gts
+```glimmer-ts
 <Box @width={{2}} @flexWrap="wrap">
   <Text>A</Text>
   <Text>BC</Text>
@@ -545,7 +545,7 @@ Allowed values: `flex-start` `center` `flex-end`
 
 See [align-items](https://css-tricks.com/almanac/properties/a/align-items/).
 
-```gts
+```glimmer-ts
 <Box @alignItems="flex-start">
   <Box @marginRight={{1}}>
     <Text>X</Text>
@@ -565,7 +565,7 @@ Allowed values: `auto` `flex-start` `center` `flex-end`
 
 See [align-self](https://css-tricks.com/almanac/properties/a/align-self/).
 
-```gts
+```glimmer-ts
 <Box @height={{3}}>
   <Box @alignSelf="flex-start">
     <Text>X</Text>
@@ -583,7 +583,7 @@ Allowed values: `flex-start` `center` `flex-end` `space-between` `space-around` 
 
 See [justify-content](https://css-tricks.com/almanac/properties/j/justify-content/).
 
-```gts
+```glimmer-ts
 <Box @justifyContent="flex-start">
   <Text>X</Text>
 </Box>
@@ -645,7 +645,7 @@ Add a border with a specified style.
 If `borderStyle` is `undefined` (the default), no border will be added.
 Ember TUI uses border styles from the [`cli-boxes`](https://github.com/sindresorhus/cli-boxes) module.
 
-```gts
+```glimmer-ts
 <Box @flexDirection="column">
   <Box>
     <Box @borderStyle="single" @marginRight={{2}}>
@@ -671,7 +671,7 @@ Type: `string`
 Change border color.
 A shorthand for setting `borderTopColor`, `borderRightColor`, `borderBottomColor`, and `borderLeftColor`.
 
-```gts
+```glimmer-ts
 <Box @borderStyle="round" @borderColor="green">
   <Text>Green Rounded Box</Text>
 </Box>
@@ -685,7 +685,7 @@ Default: `false`
 Dim the border color.
 A shorthand for setting `borderTopDimColor`, `borderBottomDimColor`, `borderLeftDimColor`, and `borderRightDimColor`.
 
-```gts
+```glimmer-ts
 <Box @borderStyle="round" @borderDimColor={{true}}>
   <Text>Hello world</Text>
 </Box>
@@ -708,7 +708,7 @@ Background color for the element.
 
 Accepts the same values as [`color`](#color) in the `<Text>` component.
 
-```gts
+```glimmer-ts
 <Box @flexDirection="column">
   <Box @backgroundColor="red" @width={{20}} @height={{5}} @alignSelf="flex-start">
     <Text>Red background</Text>
@@ -733,7 +733,7 @@ Default: `1`
 
 Number of newlines to insert.
 
-```gts
+```glimmer-ts
 import { render, Text, Newline } from 'ember-tui';
 
 const template = <template>
@@ -761,7 +761,7 @@ It's useful as a shortcut for filling all the available space between elements.
 
 For example, using `<Spacer>` in a `<Box>` with default flex direction (`row`) will position "Left" on the left side and will push "Right" to the right side.
 
-```gts
+```glimmer-ts
 import { render, Box, Text, Spacer } from 'ember-tui';
 
 const template = <template>
@@ -781,7 +781,7 @@ render(template);
 It's useful for displaying activity like completed tasks or logs - things that
 don't change after they're rendered (hence the name "Static").
 
-```gts
+```glimmer-ts
 import { render, Static, Box, Text } from 'ember-tui';
 import { tracked } from '@glimmer/tracking';
 
@@ -839,7 +839,7 @@ For example, you might want to apply a gradient to text or create some text effe
 
 **Note:** `<Transform>` must be applied only to `<Text>` children components and shouldn't change the dimensions of the output; otherwise, the layout will be incorrect.
 
-```gts
+```glimmer-ts
 import { render, Transform, Text } from 'ember-tui';
 
 const template = <template>
@@ -929,10 +929,10 @@ Same options as `render()`.
 
 Check out the [examples](ember-tui-demo/app/templates) directory for more examples:
 
-- [Colors Demo](ember-tui-demo/app/templates/colors.gts) - Demonstrates text colors and styles
-- [Box Layout Demo](ember-tui-demo/app/templates/box-demo.gts) - Shows flexbox layout capabilities
-- [Static Component](ember-tui-demo/app/templates/static-test.gts) - Example of using Static component
-- [Lorem Ipsum](ember-tui-demo/app/templates/lorem.gts) - Text wrapping and layout
+- [Colors Demo](ember-tui-demo/app/templates/colors.glimmer-ts) - Demonstrates text colors and styles
+- [Box Layout Demo](ember-tui-demo/app/templates/box-demo.glimmer-ts) - Shows flexbox layout capabilities
+- [Static Component](ember-tui-demo/app/templates/static-test.glimmer-ts) - Example of using Static component
+- [Lorem Ipsum](ember-tui-demo/app/templates/lorem.glimmer-ts) - Text wrapping and layout
 
 ## License
 
