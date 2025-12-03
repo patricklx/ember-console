@@ -27,6 +27,14 @@
       },
       "default": "./src/index.ts"
     },
+    "./render/apply-term-updates": {
+      "default": "./dist/render/apply-term-updates.js",
+      "types": "./declarations/render/apply-term-updates.d.ts"
+    },
+    "./test-utils/FakeTTY": {
+      "default": "./dist/test-utils/FakeTTY.js",
+      "types": "./declarations/test-utils/FakeTTY.d.ts"
+    },
     "./*": {
       "default": "./dist/*",
       "types": "./declarations/*"
