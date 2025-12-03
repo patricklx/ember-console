@@ -12,7 +12,7 @@
   <circle cx="55" cy="25" r="5" fill="#27c93f"/>
 
   <!-- Terminal Prompt Line -->
-  <text x="20" y="60" font-family="monospace" font-size="12" fill="#4ade80">$</text>
+  <text x="20" y="60" font-family="monospace" font-size="12" fill="#4ade80">></text>
   <rect x="30" y="50" width="8" height="14" fill="#4ade80" opacity="0.7"/>
 
   <!-- Ember Logo (Tomster) in center -->
