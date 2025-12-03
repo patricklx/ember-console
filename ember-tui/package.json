@@ -8,6 +8,10 @@
     "dist",
     "declarations"
   ],
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:patricklx/ember-console.git"
+  },
   "publishConfig": {
     "exports": {
       ".": {
