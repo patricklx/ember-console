@@ -1,7 +1,7 @@
 import EmberApplication from '@ember/application';
 // @ts-expect-error - ember-resolver types not properly exported
 import Resolver from 'ember-resolver/index.js';
-import ENV from './config/env';
+import ENV from './config/environment.ts';
 import compatModules from '@embroider/virtual/compat-modules';
 import ApplicationInstance from "@ember/application/instance";
 import { setup, DocumentNode, startRender } from 'ember-tui';

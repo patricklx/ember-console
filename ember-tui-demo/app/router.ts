@@ -1,5 +1,5 @@
 import EmberRouter from '@ember/routing/router';
-import ENV from './config/env';
+import ENV from './config/environment.ts';
 
 export default class Router extends EmberRouter {
   location = 'none';
