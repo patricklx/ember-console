@@ -6,7 +6,7 @@ import path from 'path';
 import { resolver, templateTag } from '@embroider/vite';
 
 export default {
-  input: 'app/index.ts',
+  input: 'app/app.ts',
   output: {
     dir: 'dist',
     format: 'es',

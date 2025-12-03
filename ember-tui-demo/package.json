@@ -5,7 +5,7 @@
 	"type": "module",
 	"private": true,
 	"scripts": {
-		"start": "node --enable-source-maps --loader ./loader.mjs app/index.ts",
+		"start": "node --enable-source-maps --loader ./loader.mjs app/app.ts",
 		"dev": "rollup -c -w",
 		"build": "rollup -c",
         "lint": "concurrently 'pnpm:lint:*(!fix)' --names 'lint:'",
