@@ -28,7 +28,7 @@
       "default": "./src/index.ts"
     },
     "./*": {
-      "default": "./src/*.ts"
+      "default": "./dist/*.js"
     }
   },
   "scripts": {
