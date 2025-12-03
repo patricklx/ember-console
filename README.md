@@ -933,10 +933,10 @@ Same options as `render()`.
 
 Check out the [examples](ember-tui-demo/app/templates) directory for more examples:
 
-- [Colors Demo](ember-tui-demo/app/templates/colors.glimmer-ts) - Demonstrates text colors and styles
-- [Box Layout Demo](ember-tui-demo/app/templates/box-demo.glimmer-ts) - Shows flexbox layout capabilities
-- [Static Component](ember-tui-demo/app/templates/static-test.glimmer-ts) - Example of using Static component
-- [Lorem Ipsum](ember-tui-demo/app/templates/lorem.glimmer-ts) - Text wrapping and layout
+- [Colors Demo](ember-tui-demo/app/templates/colors.gts) - Demonstrates text colors and styles
+- [Box Layout Demo](ember-tui-demo/app/templates/box-demo.gts) - Shows flexbox layout capabilities
+- [Static Component](ember-tui-demo/app/templates/static-test.gts) - Example of using Static component
+- [Lorem Ipsum](ember-tui-demo/app/templates/lorem.gts) - Text wrapping and layout
 
 ## License
 
