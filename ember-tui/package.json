@@ -41,7 +41,7 @@
     }
   },
   "scripts": {
-    "build": "rollup --config",
+    "build": "rollup --config && pnpm build:types",
     "build:types": "ember-tsc --project tsconfig.build.json --declaration && npx fix-bad-declaration-output './declarations/**/*.d.ts'",
     "lint": "concurrently 'pnpm:lint:*(!fix)' --names 'lint:'",
     "lint:fix": "concurrently 'pnpm:lint:*:fix' --names 'fix:'",
