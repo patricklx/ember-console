@@ -61,6 +61,11 @@ if ! grep -q "globalThis.self = globalThis;" app/deprecation-workflow.ts; then
   sed -i '2i globalThis.self = globalThis;' app/deprecation-workflow.ts
 fi
 
+# Ensure locationType is set to 'none' in config/environment.js
+if [ -f config/environment.js ]; then
+  sed -i "s/locationType: 'history'/locationType: 'none'/g" config/environment.js
+fi
+
 # Fetch remote package.json and merge scripts section
 curl -s https://raw.githubusercontent.com/patricklx/ember-tui/refs/heads/scripts/ember-tui-demo/package.json > /tmp/remote-package.json
 if [ -f package.json ]; then
