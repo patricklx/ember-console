@@ -4,10 +4,14 @@
   "description": "Ember Terminal UI library",
   "type": "module",
   "main": "./dist/index.js",
+  "bin": {
+    "ember-tui": "./bin/create-app.js"
+  },
   "files": [
     "dist",
     "declarations",
-    "addon.cjs"
+    "addon.cjs",
+    "bin"
   ],
   "repository": {
     "type": "git",
