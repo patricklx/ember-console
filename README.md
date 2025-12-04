@@ -18,7 +18,7 @@ Only Ember TUI's methods are documented in this readme.
 
 to create a new terminal app just run
 ```
-npx ember-tui <my-cli-app> --pnpm
+npx ember-tui create-app <my-cli-app> --pnpm
 pnpm prebuild
 pnpm start
 ```
