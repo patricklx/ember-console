@@ -88,9 +88,6 @@ importers:
       '@eslint/js':
         specifier: ^9.28.0
         version: 9.39.1
-      '@glimmer/tracking':
-        specifier: ^1.1.2
-        version: 1.1.2
       '@glint/ember-tsc':
         specifier: ^1.0.8
         version: 1.0.8(typescript@5.9.3)
