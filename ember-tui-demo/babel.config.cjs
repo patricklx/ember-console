@@ -31,7 +31,7 @@ try {
       included: () => null,
     }
   })
-} catch (e) {
+} catch {
   //console.error(e);
 }
 

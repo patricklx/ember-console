@@ -1,3 +1,4 @@
+/* eslint-env node */
 'use strict';
 
 module.exports = function (environment) {
@@ -5,7 +6,7 @@ module.exports = function (environment) {
     modulePrefix: 'ember-tui-demo',
     environment,
     rootURL: '/',
-    locationType: 'history',
+    locationType: 'none',
     EmberENV: {
       EXTEND_PROTOTYPES: false,
       FEATURES: {

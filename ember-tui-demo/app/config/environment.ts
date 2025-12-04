@@ -1,9 +1,8 @@
 import { assert } from '@ember/debug';
-// @ts-ignore
 import contentFor from '.embroider/content-for.json';
 
 const head = contentFor['/index.html'].head;
-const rawConfig = head.substring(head.indexOf('content=\"') + 'content=\"'.length, head.indexOf('\" />'))
+const rawConfig = head.substring(head.indexOf('content="') + 'content="'.length, head.indexOf('" />'))
 
 const config = JSON.parse(decodeURIComponent(rawConfig));
 

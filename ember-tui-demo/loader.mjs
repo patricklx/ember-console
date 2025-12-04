@@ -54,6 +54,10 @@ const resolverloader = new ResolverLoader(process.cwd());
 
 const emberResolverContext = (nextResolve) => ({
   async resolve(spec, from) {
+    // Skip built-in Node.js modules
+    if (spec.startsWith('node:')) {
+      return null;
+    }
     if (!from.startsWith('file://')) {
       from = `file://${from}`;
     }
@@ -79,6 +83,9 @@ const emberResolverContext = (nextResolve) => ({
 });
 
 export async function resolve(specifier, context, nextResolve) {
+  if (specifier.startsWith('node:')) {
+    return nextResolve(specifier, context);
+  }
   if (specifier.endsWith('-embroider-implicit-modules.js')) {
     return {
       url: `file://${specifier}`,
@@ -138,6 +145,14 @@ export async function resolve(specifier, context, nextResolve) {
 }
 
 export async function load(url, context, nextLoad) {
+  // Skip built-in Node.js modules - don't intercept them at all
+  if (url.startsWith('node:')) {
+    return {
+      format: 'builtin',
+      source: null,
+      shortCircuit: true,
+    }
+  }
 
   if (url.endsWith('-embroider-implicit-modules.js')) {
     return {
@@ -145,10 +160,6 @@ export async function load(url, context, nextLoad) {
       source: 'export default {}',
       shortCircuit: true,
     };
-  }
-
-  if (url.startsWith('node:')) {
-    return nextLoad(url, context);
   }
 
   // Handle CommonJS modules in node_modules
@@ -199,7 +210,7 @@ export async function load(url, context, nextLoad) {
     };
   }
 
-  content = emberTemplateTag.transform(content, filePath)?.code || content;
+  content = (await emberTemplateTag.transform(content, filePath))?.code || content;
 
   const result = transformSync(content, {
     ...babelConfig,
