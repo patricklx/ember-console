@@ -17,19 +17,24 @@ global.__embroider_macros_global__ = {
 };
 
 
-const emberDataAddon = path.resolve('node_modules', 'ember-data', 'addon-main.cjs');
-require(emberDataAddon).included.call({
-  _internalRegisterV2Addon: () => null,
-  parent: {},
-  app: {
-    project: {
-      root: __dirname,
+try {
+  const emberDataAddon = path.resolve('node_modules', 'ember-data', 'addon-main.cjs');
+  require(emberDataAddon).included.call({
+    _internalRegisterV2Addon: () => null,
+    parent: {},
+    app: {
+      project: {
+        root: __dirname,
+      },
     },
-  },
-  _super: {
-    included: () => null,
-  }
-})
+    _super: {
+      included: () => null,
+    }
+  })
+} catch (e) {
+  //console.error(e);
+}
+
 
 module.exports = {
   plugins: [

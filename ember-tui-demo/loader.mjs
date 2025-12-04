@@ -4,12 +4,13 @@ import { existsSync, statSync, readFileSync, realpathSync } from 'fs';
 import { transformSync } from '@babel/core';
 import babelConfig from './babel.config.cjs';
 import { resolver, templateTag } from '@embroider/vite';
+import { ResolverLoader } from '@embroider/core';
 
 
 // Helper function to try multiple extensions
 function tryExtensions(basePath, extensions = ['js', 'ts', 'gts', '.gjs']) {
   // Try with extensions first
-	basePath = basePath
+  basePath = basePath
     .replace('.js', '')
     .replace('.ts', '')
     .replace('.gjs', '')
@@ -48,7 +49,7 @@ function tryExtensions(basePath, extensions = ['js', 'ts', 'gts', '.gjs']) {
 
 const emberResolver = resolver();
 const emberTemplateTag = templateTag();
-
+const resolverloader = new ResolverLoader(process.cwd());
 
 
 const emberResolverContext = (nextResolve) => ({
@@ -69,6 +70,7 @@ const emberResolverContext = (nextResolve) => ({
       });
       return {
         id: res.url,
+        format: res.format,
       }
     } catch (error) {
       return null;
@@ -77,21 +79,21 @@ const emberResolverContext = (nextResolve) => ({
 });
 
 export async function resolve(specifier, context, nextResolve) {
-	if (specifier.endsWith('-embroider-implicit-modules.js')) {
-		return {
-			url: `file://${specifier}`,
-			format: 'module',
-			shortCircuit: true,
-		};
-	}
+  if (specifier.endsWith('-embroider-implicit-modules.js')) {
+    return {
+      url: `file://${specifier}`,
+      format: 'module',
+      shortCircuit: true,
+    };
+  }
 
   if (specifier.startsWith('node:')) {
     return nextResolve(specifier, context);
   }
 
-	if (specifier.includes('.embroider/content-for.json')) {
-		specifier = path.resolve('.', 'node_modules', specifier);
-	}
+  if (specifier.includes('.embroider/content-for.json')) {
+    specifier = path.resolve('.', 'node_modules', specifier);
+  }
 
   // Force emoji-regex to use ESM (.mjs) instead of CommonJS (.js)
   if (specifier === 'emoji-regex') {
@@ -119,11 +121,14 @@ export async function resolve(specifier, context, nextResolve) {
     };
   }
   if (res) {
-    const r = nextResolve(res.id, {
+    const r = await nextResolve(res.id, {
       ...context,
       conditions: ['import', 'node', 'module-sync', 'node-addons'],
     });
-    r.format = 'module';
+    const f = r.url.replace('file://', '');
+    const pkg = resolverloader.resolver.packageCache.ownerOfFile(f);
+    const isEmber = pkg?.isEmberAddon() || pkg?.packageJSON.ember;
+    r.format = isEmber ? 'module' : r.format ;
     return r;
   }
   return nextResolve(specifier, {
@@ -134,19 +139,18 @@ export async function resolve(specifier, context, nextResolve) {
 
 export async function load(url, context, nextLoad) {
 
-	if (url.endsWith('-embroider-implicit-modules.js')) {
-		return {
-			format: 'module',
-			source: 'export default {}',
-			shortCircuit: true,
-		};
-	}
+  if (url.endsWith('-embroider-implicit-modules.js')) {
+    return {
+      format: 'module',
+      source: 'export default {}',
+      shortCircuit: true,
+    };
+  }
 
   // Handle CommonJS modules in node_modules
   if (url.includes('node_modules') && (url.endsWith('.js') || url.endsWith('.cjs'))) {
     // Only wrap if context indicates it's CommonJS (format: 'commonjs')
     // or if format is not specified (let require handle detection)
-    console.log('check', url, context);
     if (!context.format || context.format === 'commonjs') {
       try {
         const filePath = fileURLToPath(url);
@@ -177,10 +181,7 @@ export async function load(url, context, nextLoad) {
   }
 
 
-  let content = emberResolver.load(filePath);
-  if (existsSync(filePath)) {
-    content = readFileSync(filePath, 'utf8');
-  }
+  let content = await emberResolver.load(filePath);
 
   if (url.endsWith('.json')) {
     return {
@@ -191,10 +192,6 @@ export async function load(url, context, nextLoad) {
   }
 
   content = emberTemplateTag.transform(content, filePath)?.code || content;
-
-  if (!content) {
-    return nextLoad(url, context);
-  }
 
   const result = transformSync(content, {
     ...babelConfig,

@@ -21,10 +21,18 @@ for arg in "$@"; do
   fi
 done
 
+# Check for required tools
+for tool in jq grep sed curl $PKG_MANAGER; do
+  if ! command -v $tool &> /dev/null; then
+    echo "Error: $tool is not installed. Please install it and try again."
+    exit 1
+  fi
+done
+
 
 rm -f testem.cjs
 rm -f ./tests/helpers/index.ts
-rmdir -f ./tests/helpers
+rmdir ./tests/helpers
 
 curl https://raw.githubusercontent.com/patricklx/ember-tui/refs/heads/scripts/ember-tui-demo/app/config/environment.ts > app/config/environment.ts
 curl https://raw.githubusercontent.com/patricklx/ember-tui/refs/heads/scripts/ember-tui-demo/app/app.ts > app/app.ts
@@ -47,6 +55,11 @@ import { Box, Text } from 'ember-tui';
   </Box>
 </template>
 EOF
+
+# Insert globalThis.self line into deprecation-workflow.ts at line 2 if not already present
+if ! grep -q "globalThis.self = globalThis;" app/deprecation-workflow.ts; then
+  sed -i '2i globalThis.self = globalThis;' app/deprecation-workflow.ts
+fi
 
 # Fetch remote package.json and merge scripts section
 curl -s https://raw.githubusercontent.com/patricklx/ember-tui/refs/heads/scripts/ember-tui-demo/package.json > /tmp/remote-package.json
