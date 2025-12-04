@@ -2,6 +2,17 @@
 
 ## Release (2025-12-04)
 
+* ember-tui 0.2.4 (patch)
+
+#### :bug: Bug Fix
+* `ember-tui`
+  * [#19](https://github.com/patricklx/ember-tui/pull/19) fix missing file ([@patricklx](https://github.com/patricklx))
+
+#### Committers: 1
+- Patrick Pircher ([@patricklx](https://github.com/patricklx))
+
+## Release (2025-12-04)
+
 * ember-tui 0.2.3 (patch)
 
 #### :bug: Bug Fix
